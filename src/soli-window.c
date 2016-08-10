@@ -17,43 +17,41 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "soli-app.h"
 #include "soli-window.h"
-
-struct _SoliWindowPrivate
-{
-	 /* To avoid warning:
-	  * (g_type_class_add_private: assertion `private_size > 0' failed)
-	  */
-	 gchar dummy;
-};
-
 
 G_DEFINE_TYPE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
 soli_window_init (SoliWindow *soli_window)
 {
-	soli_window->priv = G_TYPE_INSTANCE_GET_PRIVATE (soli_window, SOLI_TYPE_WINDOW, SoliWindowPrivate);
-
-	/* TODO: Add initialization code here */
-}
-
-static void
-soli_window_finalize (GObject *object)
-{
-	/* TODO: Add deinitalization code here */
-
-	G_OBJECT_CLASS (soli_window_parent_class)->finalize (object);
+	gtk_widget_init_template (GTK_WIDGET (soli_window));
 }
 
 static void
 soli_window_class_init (SoliWindowClass *klass)
 {
-	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-
-	g_type_class_add_private (klass, sizeof (SoliWindowPrivate));
-
-	object_class->finalize = soli_window_finalize;
+	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass),
+	                                             "/org/gnome/soli/window.ui");
 }
+
+SoliWindow *
+soli_window_new (SoliApp *app)
+{
+	return g_object_new (SOLI_WINDOW_TYPE, "application", app, NULL);
+}
+
+void
+soli_window_open (SoliWindow *win, GFile *file)
+{
+	return;
+}
+
+
+
+
+
+
+
 
 

@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * soli.h
+ * soli-app.h
  * Copyright (C) 2016 David Luco <dluco11@gmail.com>
  * 
  * Soli is free software: you can redistribute it and/or modify it
@@ -17,43 +17,35 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOLI_
-#define _SOLI_
+#ifndef _SOLI_APP_
+#define _SOLI_APP_
 
 #include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
-#define SOLI_TYPE_APPLICATION             (soli_get_type ())
-#define SOLI_APPLICATION(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_TYPE_APPLICATION, Soli))
-#define SOLI_APPLICATION_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), SOLI_TYPE_APPLICATION, SoliClass))
-#define SOLI_IS_APPLICATION(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SOLI_TYPE_APPLICATION))
-#define SOLI_IS_APPLICATION_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), SOLI_TYPE_APPLICATION))
-#define SOLI_APPLICATION_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), SOLI_TYPE_APPLICATION, SoliClass))
+#define SOLI_APP_TYPE             (soli_app_get_type ())
+#define SOLI_APP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_APP_TYPE, SoliApp))
 
-typedef struct _SoliClass SoliClass;
-typedef struct _Soli Soli;
-typedef struct _SoliPrivate SoliPrivate;
+typedef struct _SoliAppClass SoliAppClass;
+typedef struct _SoliApp SoliApp;
 
-struct _SoliClass
+struct _SoliAppClass
 {
 	GtkApplicationClass parent_class;
 };
 
-struct _Soli
+struct _SoliApp
 {
 	GtkApplication parent;
-
-	SoliPrivate *priv;
-
 };
 
-GType soli_get_type (void) G_GNUC_CONST;
-Soli *soli_new (void);
+GType soli_app_get_type (void) G_GNUC_CONST;
+SoliApp *soli_app_new (void);
 
 /* Callbacks */
 
 G_END_DECLS
 
-#endif /* _APPLICATION_H_ */
+#endif /* _SOLI_APP_ */
 
