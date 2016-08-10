@@ -1,1 +1,8 @@
-*~
+soli.anjuta
+.anjuta*
+
+Debug/
+
+autom4te.cache/
+
+*\~
