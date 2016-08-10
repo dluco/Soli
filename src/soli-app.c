@@ -33,7 +33,7 @@ soli_app_activate (GApplication *app)
 {
 	SoliWindow *win;
 
-	win = soli_window_new(SOLI_APP (app));
+	win = soli_window_new (SOLI_APP (app));
 	gtk_window_present (GTK_WINDOW (win));	
 }
 
