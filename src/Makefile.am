@@ -16,6 +16,7 @@ bin_PROGRAMS = soli
 
 UI_FILES = \
 	window.ui \
+	menu-bar.ui \
 	$(NULL)
 
 soli_SOURCES = \

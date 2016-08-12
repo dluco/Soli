@@ -16,6 +16,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "soli-app.h"
 #include "soli-window.h"
 
@@ -25,6 +30,73 @@ G_DEFINE_TYPE (SoliApp, soli_app, GTK_TYPE_APPLICATION);
 static void
 soli_app_init (SoliApp *object)
 {
+}
+
+static void
+preferences_activated (GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       app)
+{
+}
+
+static void
+quit_activated (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       app)
+{
+	g_application_quit (G_APPLICATION (app));
+}
+
+static void
+about_activated (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       app)
+{
+	static const gchar *authors[] = { "David Luco", NULL };
+	GtkWindow *win;
+
+	win = gtk_application_get_active_window (GTK_APPLICATION (app));
+	
+	gtk_show_about_dialog (win,
+	                       "program-name",  "Soli",
+	                       "version", VERSION,
+	                       "license-type", GTK_LICENSE_GPL_3_0,
+	                       "authors", authors,
+	                       "comments",
+	                   			"Test GTK+ application",
+	                       "website",
+	                   			"https://github.com/dluco/soli",
+	                       NULL);
+}
+
+static GActionEntry app_entries[] =
+{
+	{ "preferences", preferences_activated, NULL, NULL, NULL },
+	{ "quit", quit_activated, NULL, NULL, NULL },
+
+	{ "about", about_activated, NULL, NULL, NULL }
+};
+
+static void
+soli_app_startup (GApplication *app)
+{
+	GtkBuilder *builder;
+	GMenuModel *menu_bar;
+	const gchar *quit_accels[2] = { "<Ctrl>Q", NULL };
+
+	G_APPLICATION_CLASS (soli_app_parent_class)->startup (app);
+
+	g_action_map_add_action_entries (G_ACTION_MAP (app),
+	                                 app_entries, G_N_ELEMENTS (app_entries),
+	                                 app);
+	gtk_application_set_accels_for_action (GTK_APPLICATION (app),
+	                                       "app.quit",
+	                                       quit_accels);
+
+	builder = gtk_builder_new_from_resource ("/org/gnome/soli/menu-bar.ui");
+	menu_bar = G_MENU_MODEL (gtk_builder_get_object (builder, "menu-bar"));
+	gtk_application_set_menubar (GTK_APPLICATION (app), menu_bar);
+	g_object_unref (builder);
 }
 
 /* GApplication implementation */
@@ -55,7 +127,6 @@ soli_app_open (GApplication  *app,
 
 	for (i = 0; i < n_files; i++)
 	{
-		g_print ("File: %s\n", g_file_get_path(files[i])); // FIXME: mem-leak here
 		soli_window_open (win, files[i]);
 	}
 
@@ -65,6 +136,7 @@ soli_app_open (GApplication  *app,
 static void
 soli_app_class_init (SoliAppClass *klass)
 {
+	G_APPLICATION_CLASS (klass)->startup = soli_app_startup;
 	G_APPLICATION_CLASS (klass)->activate = soli_app_activate;
 	G_APPLICATION_CLASS (klass)->open = soli_app_open;
 }

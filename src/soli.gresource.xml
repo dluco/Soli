@@ -2,5 +2,6 @@
 <gresources>
 	<gresource prefix="/org/gnome/soli">
 		<file preprocess="xml-stripblanks">window.ui</file>
+		<file preprocess="xml-stripblanks">menu-bar.ui</file>
 	</gresource>
 </gresources>
