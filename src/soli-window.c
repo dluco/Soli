@@ -20,8 +20,6 @@
 #include "soli-app.h"
 #include "soli-window.h"
 
-typedef struct _SoliWindowPrivate SoliWindowPrivate;
-
 struct _SoliWindowPrivate
 {
 	GtkWidget *notebook;
@@ -48,7 +46,7 @@ soli_window_class_init (SoliWindowClass *klass)
 SoliWindow *
 soli_window_new (SoliApp *app)
 {
-	return g_object_new (SOLI_WINDOW_TYPE, "application", app, NULL);
+	return g_object_new (SOLI_TYPE_WINDOW, "application", app, NULL);
 }
 
 void

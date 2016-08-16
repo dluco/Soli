@@ -24,11 +24,11 @@
 
 G_BEGIN_DECLS
 
-#define SOLI_APP_TYPE             (soli_app_get_type ())
-#define SOLI_APP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_APP_TYPE, SoliApp))
+#define SOLI_TYPE_APP             (soli_app_get_type ())
+#define SOLI_APP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_TYPE_APP, SoliApp))
 
-typedef struct _SoliAppClass SoliAppClass;
 typedef struct _SoliApp SoliApp;
+typedef struct _SoliAppClass SoliAppClass;
 
 struct _SoliAppClass
 {

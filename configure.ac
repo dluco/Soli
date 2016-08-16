@@ -11,23 +11,15 @@ AM_SILENT_RULES([yes])
 
 AC_PROG_CC
 
-
-
-
-
-
-
-
 LT_INIT
 
-
-PKG_CHECK_MODULES(SOLI, [gtk+-3.0 >= 2.90.3 ])
-
-
+PKG_CHECK_MODULES(SOLI, [
+	gtk+-3.0 >= 2.90.3
+	gtksourceview-3.0 >= 3.20.3
+])
 
 
 AC_OUTPUT([
 Makefile
 src/Makefile
-
 ])

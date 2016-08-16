@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * soli-window.h
+ * soli-view.c
  * Copyright (C) 2016 David Luco <dluco11@gmail.com>
  *
  * soli is free software: you can redistribute it and/or modify it
@@ -17,36 +17,37 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOLI_WINDOW_H_
-#define _SOLI_WINDOW_H_
+#include "soli-view.h"
 
-#include <gtk/gtk.h>
-#include "soli-app.h"
-
-G_BEGIN_DECLS
-
-#define SOLI_TYPE_WINDOW             (soli_window_get_type ())
-#define SOLI_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_TYPE_WINDOW, SoliWindow))
-
-typedef struct _SoliWindow SoliWindow;
-typedef struct _SoliWindowClass SoliWindowClass;
-typedef struct _SoliWindowPrivate SoliWindowPrivate;
-
-struct _SoliWindowClass
+struct _SoliViewPrivate
 {
-	GtkApplicationWindowClass parent_class;
 };
 
-struct _SoliWindow
+
+G_DEFINE_TYPE_WITH_PRIVATE (SoliView, soli_view, GTK_SOURCE_TYPE_VIEW);
+
+static void
+soli_view_init (SoliView *view)
 {
-	GtkApplicationWindow parent;
-};
+	view->priv = soli_view_get_instance_private (view);
 
-GType soli_window_get_type (void) G_GNUC_CONST;
-SoliWindow *soli_window_new (SoliApp *app);
-void soli_window_open (SoliWindow *win, GFile *file);
+	/* TODO: Add initialization code here */
+}
 
-G_END_DECLS
+static void
+soli_view_finalize (GObject *object)
+{
+	/* TODO: Add deinitalization code here */
 
-#endif /* _SOLI_WINDOW_H_ */
+	G_OBJECT_CLASS (soli_view_parent_class)->finalize (object);
+}
+
+static void
+soli_view_class_init (SoliViewClass *klass)
+{
+	GObjectClass* object_class = G_OBJECT_CLASS (klass);
+
+	object_class->finalize = soli_view_finalize;
+}
+
 

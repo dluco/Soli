@@ -23,9 +23,17 @@ soli_SOURCES = \
 	main.c \
 	soli-app.h \
 	soli-app.c \
-	soli-window.c \
 	soli-window.h \
-	$(NULL)
+	soli-window.c \
+	soli-notebook.h \
+	soli-notebook.c \
+	soli-tab.c \
+	soli-tab.h \
+	soli-view.c \
+	soli-view.h \
+	$(NULL) \
+	soli-document.c \
+	soli-document.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic

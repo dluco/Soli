@@ -102,7 +102,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_soli_OBJECTS = main.$(OBJEXT) soli-app.$(OBJEXT) \
-	soli-window.$(OBJEXT)
+	soli-window.$(OBJEXT) soli-notebook.$(OBJEXT) \
+	soli-tab.$(OBJEXT) soli-view.$(OBJEXT) soli-document.$(OBJEXT)
 am__objects_1 = soli-resources.$(OBJEXT)
 nodist_soli_OBJECTS = $(am__objects_1)
 soli_OBJECTS = $(am_soli_OBJECTS) $(nodist_soli_OBJECTS)
@@ -316,9 +317,17 @@ soli_SOURCES = \
 	main.c \
 	soli-app.h \
 	soli-app.c \
-	soli-window.c \
 	soli-window.h \
-	$(NULL)
+	soli-window.c \
+	soli-notebook.h \
+	soli-notebook.c \
+	soli-tab.c \
+	soli-tab.h \
+	soli-view.c \
+	soli-view.h \
+	$(NULL) \
+	soli-document.c \
+	soli-document.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic
@@ -437,7 +446,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-app.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-document.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-notebook.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-resources.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-view.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-window.Po@am__quote@
 
 .c.o:
