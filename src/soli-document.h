@@ -20,7 +20,7 @@
 #ifndef _SOLI_DOCUMENT_H_
 #define _SOLI_DOCUMENT_H_
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
@@ -32,8 +32,10 @@ G_BEGIN_DECLS
 #define SOLI_IS_DOCUMENT_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), SOLI_TYPE_DOCUMENT))
 #define SOLI_DOCUMENT_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), SOLI_TYPE_DOCUMENT, SoliDocumentClass))
 
-typedef struct _SoliDocumentClass SoliDocumentClass;
+//G_DECLARE_DERIVABLE_TYPE (SoliDocument, soli_document, SOLI, DOCUMENT, GtkSourceBuffer)
+
 typedef struct _SoliDocument SoliDocument;
+typedef struct _SoliDocumentClass SoliDocumentClass;
 typedef struct _SoliDocumentPrivate SoliDocumentPrivate;
 
 struct _SoliDocument
@@ -49,6 +51,10 @@ struct _SoliDocumentClass
 };
 
 GType soli_document_get_type (void) G_GNUC_CONST;
+SoliDocument *soli_document_new (void);
+
+GtkSourceFile *soli_document_get_file (SoliDocument *doc);
+GFile *soli_document_get_location (SoliDocument *doc);
 
 G_END_DECLS
 

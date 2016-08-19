@@ -21,6 +21,7 @@
 
 struct _SoliViewPrivate
 {
+	gchar dummy;
 };
 
 

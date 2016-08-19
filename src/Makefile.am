@@ -15,9 +15,9 @@ AM_CFLAGS =\
 bin_PROGRAMS = soli
 
 UI_FILES = \
-	window.ui \
-	menu-bar.ui \
-	$(NULL)
+	soli-window.ui \
+	soli-view-frame.ui \
+	menu-bar.ui
 
 soli_SOURCES = \
 	main.c \
@@ -31,9 +31,10 @@ soli_SOURCES = \
 	soli-tab.h \
 	soli-view.c \
 	soli-view.h \
-	$(NULL) \
 	soli-document.c \
-	soli-document.h
+	soli-document.h \
+	soli-view-frame.c \
+	soli-view-frame.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic
@@ -48,20 +49,16 @@ soli-resources.h: soli.gresource.xml
 
 BUILT_SOURCES = \
 	soli-resources.c \
-	soli-resources.h \
-	$(NULL)
+	soli-resources.h
 
 nodist_soli_SOURCES = \
-	$(BUILT_SOURCES) \
-	$(NULL)
+	$(BUILT_SOURCES)
 
 CLEANFILES = \
-	$(BUILT_SOURCES) \
-	$(NULL)
+	$(BUILT_SOURCES)
 
 EXTRA_DIST = \
-	$(UI_FILES) \
-	$(NULL)
+	$(UI_FILES)
 
 dist-hook:
 	cd $(distdir); rm -f $(CLEANFILES)

@@ -19,9 +19,10 @@
 
 #include "soli-document.h"
 
-struct _SoliDocumentPrivate
+typedef struct _SoliDocumentPrivate
 {
-};
+	GtkSourceFile *file;
+} SoliDocumentPrivate;
 
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliDocument, soli_document, GTK_SOURCE_TYPE_BUFFER);
@@ -31,7 +32,7 @@ soli_document_init (SoliDocument *doc)
 {
 	doc->priv = soli_document_get_instance_private (doc);
 
-	/* TODO: Add initialization code here */
+	doc->priv->file = gtk_source_file_new ();
 }
 
 static void
@@ -46,8 +47,37 @@ static void
 soli_document_class_init (SoliDocumentClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
+	GtkTextBufferClass *buf_class = GTK_TEXT_BUFFER_CLASS (klass);
 
 	object_class->finalize = soli_document_finalize;
 }
 
+SoliDocument *
+soli_document_new (void)
+{
+	return g_object_new (SOLI_TYPE_DOCUMENT, NULL);
+}
 
+GtkSourceFile *
+soli_document_get_file (SoliDocument *doc)
+{
+	SoliDocumentPrivate *priv;
+	
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+	
+	priv = soli_document_get_instance_private (doc);
+	
+	return priv->file;
+}
+
+GFile *
+soli_document_get_location (SoliDocument *doc)
+{
+	SoliDocumentPrivate *priv;
+	
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+	
+	priv = soli_document_get_instance_private (doc);
+	
+	return gtk_source_file_get_location (priv->file);
+}

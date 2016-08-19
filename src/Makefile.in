@@ -103,7 +103,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_soli_OBJECTS = main.$(OBJEXT) soli-app.$(OBJEXT) \
 	soli-window.$(OBJEXT) soli-notebook.$(OBJEXT) \
-	soli-tab.$(OBJEXT) soli-view.$(OBJEXT) soli-document.$(OBJEXT)
+	soli-tab.$(OBJEXT) soli-view.$(OBJEXT) soli-document.$(OBJEXT) \
+	soli-view-frame.$(OBJEXT)
 am__objects_1 = soli-resources.$(OBJEXT)
 nodist_soli_OBJECTS = $(am__objects_1)
 soli_OBJECTS = $(am_soli_OBJECTS) $(nodist_soli_OBJECTS)
@@ -309,9 +310,9 @@ AM_CFLAGS = \
 	 -g
 
 UI_FILES = \
-	window.ui \
-	menu-bar.ui \
-	$(NULL)
+	soli-window.ui \
+	soli-view-frame.ui \
+	menu-bar.ui
 
 soli_SOURCES = \
 	main.c \
@@ -325,9 +326,10 @@ soli_SOURCES = \
 	soli-tab.h \
 	soli-view.c \
 	soli-view.h \
-	$(NULL) \
 	soli-document.c \
-	soli-document.h
+	soli-document.h \
+	soli-view-frame.c \
+	soli-view-frame.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic
@@ -335,20 +337,16 @@ soli_LDFLAGS = \
 soli_LDADD = $(SOLI_LIBS)
 BUILT_SOURCES = \
 	soli-resources.c \
-	soli-resources.h \
-	$(NULL)
+	soli-resources.h
 
 nodist_soli_SOURCES = \
-	$(BUILT_SOURCES) \
-	$(NULL)
+	$(BUILT_SOURCES)
 
 CLEANFILES = \
-	$(BUILT_SOURCES) \
-	$(NULL)
+	$(BUILT_SOURCES)
 
 EXTRA_DIST = \
-	$(UI_FILES) \
-	$(NULL)
+	$(UI_FILES)
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -450,6 +448,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-notebook.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-resources.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-view-frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-view.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-window.Po@am__quote@
 

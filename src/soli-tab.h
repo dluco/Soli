@@ -21,6 +21,7 @@
 #define _SOLI_TAB_H_
 
 #include <gtk/gtk.h>
+#include "soli-document.h"
 
 G_BEGIN_DECLS
 
@@ -49,6 +50,14 @@ struct _SoliTab
 };
 
 GType soli_tab_get_type (void) G_GNUC_CONST;
+
+SoliTab *soli_tab_new (void);
+
+void soli_tab_load (SoliTab *tab,
+					GFile *location,
+					const GtkSourceEncoding *encoding);
+
+SoliDocument *soli_tab_get_document (SoliTab *tab);
 
 G_END_DECLS
 

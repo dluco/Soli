@@ -27,20 +27,27 @@ G_BEGIN_DECLS
 
 #define SOLI_TYPE_WINDOW             (soli_window_get_type ())
 #define SOLI_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_TYPE_WINDOW, SoliWindow))
+#define SOLI_WINDOW_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), SOLI_TYPE_WINDOW, SoliWindowClass))
+#define SOLI_IS_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SOLI_TYPE_WINDOW))
+#define SOLI_IS_WINDOW_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), SOLI_TYPE_WINDOW))
+#define SOLI_WINDOW_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), SOLI_TYPE_WINDOW, SoliWindowClass))
 
 typedef struct _SoliWindow SoliWindow;
 typedef struct _SoliWindowClass SoliWindowClass;
 typedef struct _SoliWindowPrivate SoliWindowPrivate;
+
+struct _SoliWindow
+{
+	GtkApplicationWindow parent;
+	
+	SoliWindowPrivate *priv;
+};
 
 struct _SoliWindowClass
 {
 	GtkApplicationWindowClass parent_class;
 };
 
-struct _SoliWindow
-{
-	GtkApplicationWindow parent;
-};
 
 GType soli_window_get_type (void) G_GNUC_CONST;
 SoliWindow *soli_window_new (SoliApp *app);

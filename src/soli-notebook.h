@@ -21,6 +21,7 @@
 #define _SOLI_NOTEBOOK_H_
 
 #include <gtk/gtk.h>
+#include "soli-tab.h"
 
 G_BEGIN_DECLS
 
@@ -48,6 +49,12 @@ struct _SoliNotebook
 };
 
 GType soli_notebook_get_type (void) G_GNUC_CONST;
+
+SoliNotebook *soli_notebook_new (void);
+
+void soli_notebook_add_tab (SoliNotebook *notebook,
+							SoliTab *tab,
+							gint position);
 
 G_END_DECLS
 

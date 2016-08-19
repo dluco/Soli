@@ -18,9 +18,11 @@
  */
 
 #include "soli-notebook.h"
+#include "soli-tab.h"
 
 struct _SoliNotebookPrivate
 {
+	gchar dummy;
 };
 
 
@@ -50,4 +52,50 @@ soli_notebook_class_init (SoliNotebookClass *klass)
 	object_class->finalize = soli_notebook_finalize;
 }
 
+SoliNotebook *
+soli_notebook_new (void)
+{
+	return g_object_new (SOLI_TYPE_NOTEBOOK, NULL);
+}
+
+// TODO: use a SoliTabLabel widget
+static gchar *
+get_tab_name (SoliTab *tab)
+{
+	SoliDocument *doc;
+	GFile *location;
+	
+	g_return_val_if_fail (SOLI_IS_TAB (tab), NULL);
+	
+	doc = soli_tab_get_document(tab);
+	
+	location = soli_document_get_location(doc);
+	
+	if (location != NULL)
+	{
+		return g_file_get_basename (location);
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+void
+soli_notebook_add_tab (SoliNotebook *notebook,
+						SoliTab *tab,
+						gint position)
+{
+	GtkWidget *tab_label;
+	
+	g_return_if_fail (SOLI_IS_NOTEBOOK (notebook));
+	g_return_if_fail (SOLI_IS_TAB (tab));
+	
+	tab_label = gtk_label_new (get_tab_name (tab));
+	
+	gtk_notebook_insert_page (GTK_NOTEBOOK (notebook),
+								GTK_WIDGET (tab),
+								tab_label,
+								position);
+}
 

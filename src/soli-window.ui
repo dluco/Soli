@@ -10,7 +10,7 @@
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkNotebook" id="notebook">
+          <object class="SoliNotebook" id="notebook">
             <property name="visible">True</property>
             <property name="enable_popup">True</property>
           </object>
