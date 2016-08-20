@@ -36,6 +36,28 @@ soli_document_init (SoliDocument *doc)
 }
 
 static void
+soli_document_constructed (GObject *object)
+{
+	SoliDocument *doc = SOLI_DOCUMENT (object);
+	
+	G_OBJECT_CLASS (soli_document_parent_class)->constructed (object);
+}
+
+static void
+soli_document_dispose (GObject *object)
+{
+	SoliDocument *doc = SOLI_DOCUMENT (object);
+
+	if (doc->priv->file != NULL)
+	{
+		g_object_unref (doc->priv->file);
+		doc->priv->file = NULL;
+	}
+	
+	G_OBJECT_CLASS (soli_document_parent_class)->dispose (object);
+}
+
+static void
 soli_document_finalize (GObject *object)
 {
 	/* TODO: Add deinitalization code here */
@@ -49,7 +71,11 @@ soli_document_class_init (SoliDocumentClass *klass)
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	GtkTextBufferClass *buf_class = GTK_TEXT_BUFFER_CLASS (klass);
 
+	object_class->constructed = soli_document_constructed;
+	object_class->dispose = soli_document_dispose;
 	object_class->finalize = soli_document_finalize;
+	//object_class->get_propety = soli_document_get_property;
+	//object_class->set_propety = soli_document_set_property;
 }
 
 SoliDocument *

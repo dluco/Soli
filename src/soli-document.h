@@ -32,8 +32,6 @@ G_BEGIN_DECLS
 #define SOLI_IS_DOCUMENT_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), SOLI_TYPE_DOCUMENT))
 #define SOLI_DOCUMENT_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), SOLI_TYPE_DOCUMENT, SoliDocumentClass))
 
-//G_DECLARE_DERIVABLE_TYPE (SoliDocument, soli_document, SOLI, DOCUMENT, GtkSourceBuffer)
-
 typedef struct _SoliDocument SoliDocument;
 typedef struct _SoliDocumentClass SoliDocumentClass;
 typedef struct _SoliDocumentPrivate SoliDocumentPrivate;

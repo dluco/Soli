@@ -22,6 +22,7 @@
 
 #include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
+#include "soli-document.h"
 
 G_BEGIN_DECLS
 
@@ -50,6 +51,8 @@ struct _SoliViewClass
 };
 
 GType soli_view_get_type (void) G_GNUC_CONST;
+
+GtkWidget *soli_view_new (SoliDocument *doc);
 
 G_END_DECLS
 

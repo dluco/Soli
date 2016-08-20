@@ -29,6 +29,18 @@ struct _SoliViewFramePrivate
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliViewFrame, soli_view_frame, GTK_TYPE_OVERLAY);
 
+static SoliDocument *
+get_document (SoliViewFrame *frame)
+{
+	GtkTextBuffer *buffer;
+	
+	g_return_val_if_fail (SOLI_IS_VIEW_FRAME (frame), NULL);
+	
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (frame->priv->view));
+	
+	return SOLI_IS_DOCUMENT (buffer) ? SOLI_DOCUMENT (buffer) : NULL;
+}
+
 static void
 soli_view_frame_init (SoliViewFrame *frame)
 {

@@ -142,8 +142,9 @@ launch_loader (GTask *load_task,
 	gtk_source_file_loader_set_candidate_encodings (data->loader, candidate_encodings);
 	g_slist_free (candidate_encodings);
 	
-	doc = soli_tab_get_document (tab);
-	g_signal_emit_by_name (doc, "load");
+	// TODO
+	//doc = soli_tab_get_document (tab);
+	//g_signal_emit_by_name (doc, "load");
 	
 	if (data->timer != NULL)
 	{
@@ -223,26 +224,14 @@ SoliDocument *
 soli_tab_get_document (SoliTab *tab)
 {
 	SoliView *view;
-	GtkTextBuffer *text_buffer;
-	GtkSourceBuffer *source_buffer;
+	GtkTextBuffer *buffer;
 	
 	g_return_val_if_fail (SOLI_IS_TAB (tab), NULL);
 	
 	view = soli_view_frame_get_view (tab->priv->frame);
 	
-	g_return_val_if_fail (SOLI_IS_VIEW (view), NULL);
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 	
-	text_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-	
-	g_return_val_if_fail (GTK_IS_TEXT_BUFFER (text_buffer), NULL);
-	
-	source_buffer = GTK_SOURCE_BUFFER (text_buffer);
-	
-	//g_return_val_if_fail (SOLI_IS_DOCUMENT (source_buffer), NULL);
-	
-	// FIXME: GLib-GObject-WARNING **: invalid cast from 'GtkSourceBuffer' to 'SoliDocument'
-	//return SOLI_DOCUMENT (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
-	
-	return SOLI_DOCUMENT (source_buffer);
+	return SOLI_IS_DOCUMENT (buffer) ? SOLI_DOCUMENT (buffer) : NULL;
 }
 

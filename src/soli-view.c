@@ -18,14 +18,16 @@
  */
 
 #include "soli-view.h"
+#include "soli-document.h"
 
 struct _SoliViewPrivate
 {
 	gchar dummy;
 };
 
-
 G_DEFINE_TYPE_WITH_PRIVATE (SoliView, soli_view, GTK_SOURCE_TYPE_VIEW);
+
+static GtkTextBuffer *soli_view_create_buffer (GtkTextView *text_view);
 
 static void
 soli_view_init (SoliView *view)
@@ -47,8 +49,25 @@ static void
 soli_view_class_init (SoliViewClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
+	GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
 
 	object_class->finalize = soli_view_finalize;
+	
+	text_view_class->create_buffer = soli_view_create_buffer;
+}
+
+GtkWidget *
+soli_view_new (SoliDocument *doc)
+{
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+	
+	return GTK_WIDGET (g_object_new (SOLI_TYPE_VIEW, "buffer", doc, NULL));
+}
+
+static GtkTextBuffer *
+soli_view_create_buffer (GtkTextView *text_view)
+{
+	return GTK_TEXT_BUFFER (soli_document_new ());
 }
 
 
