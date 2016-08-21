@@ -33,6 +33,39 @@ soli_app_init (SoliApp *object)
 }
 
 static void
+open_activated (GSimpleAction *action,
+				GVariant *parameter,
+				gpointer app)
+{
+	GtkWindow *win;
+	GtkWidget *dialog;
+	GtkFileChooserAction open_action = GTK_FILE_CHOOSER_ACTION_OPEN;
+	gint result;
+
+	win = gtk_application_get_active_window (GTK_APPLICATION (app));
+
+	dialog = gtk_file_chooser_dialog_new ("Open File",
+										win,
+										open_action,
+										"_Cancel",
+										GTK_RESPONSE_CANCEL,
+										"_Open",
+										GTK_RESPONSE_ACCEPT,
+										NULL);
+
+	result = gtk_dialog_run (GTK_DIALOG (dialog));
+	if (result == GTK_RESPONSE_ACCEPT)
+	{
+		GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+		soli_window_open (SOLI_WINDOW (win), file);
+
+		g_object_unref (file);
+	}
+
+	gtk_widget_destroy (dialog);
+}
+
+static void
 preferences_activated (GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       app)
@@ -71,6 +104,7 @@ about_activated (GSimpleAction *action,
 
 static GActionEntry app_entries[] =
 {
+	{ "open", open_activated, NULL, NULL, NULL },
 	{ "preferences", preferences_activated, NULL, NULL, NULL },
 	{ "quit", quit_activated, NULL, NULL, NULL },
 
@@ -82,6 +116,7 @@ soli_app_startup (GApplication *app)
 {
 	GtkBuilder *builder;
 	GMenuModel *menu_bar;
+	const gchar *open_accels[2] = { "<Ctrl>O", NULL };
 	const gchar *quit_accels[2] = { "<Ctrl>Q", NULL };
 
 	G_APPLICATION_CLASS (soli_app_parent_class)->startup (app);
@@ -89,6 +124,9 @@ soli_app_startup (GApplication *app)
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 	                                 app_entries, G_N_ELEMENTS (app_entries),
 	                                 app);
+	gtk_application_set_accels_for_action (GTK_APPLICATION (app),
+	                                       "app.open",
+	                                       open_accels);
 	gtk_application_set_accels_for_action (GTK_APPLICATION (app),
 	                                       "app.quit",
 	                                       quit_accels);
