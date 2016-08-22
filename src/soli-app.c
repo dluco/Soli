@@ -23,7 +23,7 @@
 
 #include "soli-app.h"
 #include "soli-window.h"
-
+#include "soli-commands.h"
 
 G_DEFINE_TYPE (SoliApp, soli_app, GTK_TYPE_APPLICATION);
 
@@ -32,83 +32,10 @@ soli_app_init (SoliApp *object)
 {
 }
 
-static void
-open_activated (GSimpleAction *action,
-				GVariant *parameter,
-				gpointer app)
-{
-	GtkWindow *win;
-	GtkWidget *dialog;
-	GtkFileChooserAction open_action = GTK_FILE_CHOOSER_ACTION_OPEN;
-	gint result;
-
-	win = gtk_application_get_active_window (GTK_APPLICATION (app));
-
-	dialog = gtk_file_chooser_dialog_new ("Open File",
-										win,
-										open_action,
-										"_Cancel",
-										GTK_RESPONSE_CANCEL,
-										"_Open",
-										GTK_RESPONSE_ACCEPT,
-										NULL);
-
-	result = gtk_dialog_run (GTK_DIALOG (dialog));
-	if (result == GTK_RESPONSE_ACCEPT)
-	{
-		GFile *file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-		soli_window_open (SOLI_WINDOW (win), file);
-
-		g_object_unref (file);
-	}
-
-	gtk_widget_destroy (dialog);
-}
-
-static void
-preferences_activated (GSimpleAction *action,
-                       GVariant      *parameter,
-                       gpointer       app)
-{
-}
-
-static void
-quit_activated (GSimpleAction *action,
-                GVariant      *parameter,
-                gpointer       app)
-{
-	g_application_quit (G_APPLICATION (app));
-}
-
-static void
-about_activated (GSimpleAction *action,
-                GVariant      *parameter,
-                gpointer       app)
-{
-	static const gchar *authors[] = { "David Luco", NULL };
-	GtkWindow *win;
-
-	win = gtk_application_get_active_window (GTK_APPLICATION (app));
-	
-	gtk_show_about_dialog (win,
-	                       "program-name",  "Soli",
-	                       "version", VERSION,
-	                       "license-type", GTK_LICENSE_GPL_3_0,
-	                       "authors", authors,
-	                       "comments",
-	                   			"Test GTK+ application",
-	                       "website",
-	                   			"https://github.com/dluco/soli",
-	                       NULL);
-}
-
-static GActionEntry app_entries[] =
-{
-	{ "open", open_activated, NULL, NULL, NULL },
-	{ "preferences", preferences_activated, NULL, NULL, NULL },
-	{ "quit", quit_activated, NULL, NULL, NULL },
-
-	{ "about", about_activated, NULL, NULL, NULL }
+static GActionEntry app_entries[] = {
+	{ "quit", soli_cmd_quit },
+	{ "preferences", soli_cmd_preferences },
+	{ "about", soli_cmd_about }
 };
 
 static void
@@ -116,24 +43,17 @@ soli_app_startup (GApplication *app)
 {
 	GtkBuilder *builder;
 	GMenuModel *menu_bar;
-	const gchar *open_accels[2] = { "<Ctrl>O", NULL };
-	const gchar *quit_accels[2] = { "<Ctrl>Q", NULL };
 
 	G_APPLICATION_CLASS (soli_app_parent_class)->startup (app);
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 	                                 app_entries, G_N_ELEMENTS (app_entries),
 	                                 app);
-	gtk_application_set_accels_for_action (GTK_APPLICATION (app),
-	                                       "app.open",
-	                                       open_accels);
-	gtk_application_set_accels_for_action (GTK_APPLICATION (app),
-	                                       "app.quit",
-	                                       quit_accels);
 
 	builder = gtk_builder_new_from_resource ("/org/gnome/soli/menu-bar.ui");
 	menu_bar = G_MENU_MODEL (gtk_builder_get_object (builder, "menu-bar"));
 	gtk_application_set_menubar (GTK_APPLICATION (app), menu_bar);
+
 	g_object_unref (builder);
 }
 

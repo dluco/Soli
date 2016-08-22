@@ -34,7 +34,9 @@ soli_SOURCES = \
 	soli-document.c \
 	soli-document.h \
 	soli-view-frame.c \
-	soli-view-frame.h
+	soli-view-frame.h \
+	soli-commands.c \
+	soli-commands.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic

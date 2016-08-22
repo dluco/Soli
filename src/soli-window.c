@@ -21,6 +21,7 @@
 #include "soli-window.h"
 #include "soli-notebook.h"
 #include "soli-tab.h"
+#include "soli-commands.h"
 
 struct _SoliWindowPrivate
 {
@@ -29,12 +30,21 @@ struct _SoliWindowPrivate
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW);
 
+static GActionEntry win_entries[] = {
+	{ "open", soli_cmd_open }
+};
+
 static void
 soli_window_init (SoliWindow *window)
 {
 	window->priv = soli_window_get_instance_private (window);
 
 	gtk_widget_init_template (GTK_WIDGET (window));
+
+	g_action_map_add_action_entries (G_ACTION_MAP (window),
+									win_entries,
+									G_N_ELEMENTS (win_entries),
+									window);
 }
 
 static void

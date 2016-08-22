@@ -104,7 +104,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_soli_OBJECTS = main.$(OBJEXT) soli-app.$(OBJEXT) \
 	soli-window.$(OBJEXT) soli-notebook.$(OBJEXT) \
 	soli-tab.$(OBJEXT) soli-view.$(OBJEXT) soli-document.$(OBJEXT) \
-	soli-view-frame.$(OBJEXT)
+	soli-view-frame.$(OBJEXT) soli-commands.$(OBJEXT)
 am__objects_1 = soli-resources.$(OBJEXT)
 nodist_soli_OBJECTS = $(am__objects_1)
 soli_OBJECTS = $(am_soli_OBJECTS) $(nodist_soli_OBJECTS)
@@ -329,7 +329,9 @@ soli_SOURCES = \
 	soli-document.c \
 	soli-document.h \
 	soli-view-frame.c \
-	soli-view-frame.h
+	soli-view-frame.h \
+	soli-commands.c \
+	soli-commands.h
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic
@@ -444,6 +446,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-app.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-document.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-notebook.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/soli-resources.Po@am__quote@
