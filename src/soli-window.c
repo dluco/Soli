@@ -31,7 +31,8 @@ struct _SoliWindowPrivate
 G_DEFINE_TYPE_WITH_PRIVATE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static GActionEntry win_entries[] = {
-	{ "open", soli_cmd_open }
+	{ "open", soli_cmd_open },
+	{ "save", soli_cmd_save }
 };
 
 static void
@@ -69,6 +70,14 @@ soli_window_get_notebook (SoliWindow *window)
 	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
 
 	return GTK_WIDGET (window->priv->notebook);
+}
+
+SoliTab *
+soli_window_get_active_tab (SoliWindow *window)
+{
+	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
+
+	return soli_notebook_get_active_tab (window->priv->notebook);
 }
 
 static SoliTab *

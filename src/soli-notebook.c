@@ -81,6 +81,15 @@ get_tab_name (SoliTab *tab)
 	}
 }
 
+SoliTab *
+soli_notebook_get_active_tab (SoliNotebook *notebook)
+{
+	g_return_val_if_fail (SOLI_IS_NOTEBOOK (notebook), NULL);
+
+	return SOLI_TAB (gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook),
+			gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook))));
+}
+
 void
 soli_notebook_add_tab (SoliNotebook *notebook,
 						SoliTab *tab,

@@ -52,6 +52,8 @@ GType soli_notebook_get_type (void) G_GNUC_CONST;
 
 SoliNotebook *soli_notebook_new (void);
 
+SoliTab *soli_notebook_get_active_tab (SoliNotebook *notebook);
+
 void soli_notebook_add_tab (SoliNotebook *notebook,
 							SoliTab *tab,
 							gint position);

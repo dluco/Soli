@@ -22,7 +22,9 @@
 
 #include <gtk/gtk.h>
 
-void soli_cmd_open (GSimpleAction *action, GVariant *parameter, gpointer app);
+void soli_cmd_open (GSimpleAction *action, GVariant *parameter, gpointer window);
+
+void soli_cmd_save (GSimpleAction *action, GVariant *parameter, gpointer window);
 
 void soli_cmd_preferences (GSimpleAction *action, GVariant *parameter, gpointer app);
 

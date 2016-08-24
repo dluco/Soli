@@ -53,9 +53,19 @@ GType soli_tab_get_type (void) G_GNUC_CONST;
 
 SoliTab *soli_tab_new (void);
 
+SoliTab *soli_tab_get_from_document (SoliDocument *doc);
+
 void soli_tab_load (SoliTab *tab,
 					GFile *location,
 					const GtkSourceEncoding *encoding);
+
+gboolean soli_tab_save_finish (SoliTab *tab, GAsyncResult *result);
+
+void
+soli_tab_save_async (SoliTab *tab,
+					GCancellable *cancellable,
+					GAsyncReadyCallback callback,
+					gpointer user_data);
 
 SoliDocument *soli_tab_get_document (SoliTab *tab);
 

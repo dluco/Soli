@@ -23,6 +23,8 @@
 
 #include "soli-commands.h"
 #include "soli-window.h"
+#include "soli-tab.h"
+#include "soli-document.h"
 #include <gtk/gtk.h>
 
 void
@@ -53,6 +55,89 @@ soli_cmd_open (GSimpleAction *action,
 	}
 
 	gtk_widget_destroy (dialog);
+}
+
+gboolean
+soli_commands_save_document_finish (SoliDocument *doc,
+									GAsyncResult *result)
+{
+	g_return_val_if_fail (g_task_is_valid (result, doc), FALSE);
+
+	return g_task_propagate_boolean (G_TASK (result), NULL);
+}
+
+static void
+save_tab_ready_cb (SoliDocument *doc,
+					GAsyncResult *result,
+					gpointer user_data)
+{
+	soli_commands_save_document_finish (doc, result);
+}
+
+static void
+tab_save_ready_cb (SoliTab *tab,
+					GAsyncResult *result,
+					GTask *task)
+{
+	g_task_return_boolean (task, soli_tab_save_finish (tab, result));
+	g_object_unref (task);
+}
+
+static void
+save_document_async (SoliDocument *doc,
+					SoliWindow *window,
+					GCancellable *cancellable,
+					GAsyncReadyCallback callback,
+					gpointer user_data)
+{
+	GTask *task;
+	SoliTab *tab;
+	GtkSourceFile *file;
+
+	g_return_if_fail (SOLI_IS_DOCUMENT (doc));
+	g_return_if_fail (SOLI_IS_WINDOW (window));
+	g_return_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable));
+
+	task = g_task_new (doc, cancellable, callback, user_data);
+
+	tab = soli_tab_get_from_document (doc);
+	file = soli_document_get_file (doc);
+
+	// TODO: what if file is untitled?
+
+	soli_tab_save_async (tab,
+						cancellable,
+						(GAsyncReadyCallback) tab_save_ready_cb,
+						task);
+}
+
+static void
+save_tab (SoliTab *tab, SoliWindow *window)
+{
+	SoliDocument *doc = soli_tab_get_document (tab);
+
+	save_document_async (doc,
+						window,
+						NULL,
+						(GAsyncReadyCallback) save_tab_ready_cb,
+						NULL);
+}
+
+void
+soli_cmd_save (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	SoliWindow *window = SOLI_WINDOW (user_data);
+	SoliTab *tab;
+
+	tab = soli_window_get_active_tab (window);
+	if (tab != NULL)
+	{
+		g_print ("Saving file...\n");
+
+		save_tab (tab, window);
+	}
 }
 
 void

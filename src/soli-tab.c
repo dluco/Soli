@@ -22,12 +22,15 @@
 #include "soli-view-frame.h"
 #include <gtksourceview/gtksource.h>
 
+#define SOLI_TAB_KEY "SOLI_TAB_KEY"
+
 struct _SoliTabPrivate
 {
 	SoliViewFrame *frame;
 };
 
 typedef struct _LoaderData LoaderData;
+typedef struct _SaverData SaverData;
 
 struct _LoaderData
 {
@@ -37,12 +40,20 @@ struct _LoaderData
 	guint user_requested_encoding : 1;
 };
 
+struct _SaverData
+{
+	GtkSourceFileSaver *saver;
+	GTimer *timer;
+};
+
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliTab, soli_tab, GTK_TYPE_BOX);
 
 static void
 soli_tab_init (SoliTab *tab)
 {
+	SoliDocument *doc;
+
 	tab->priv = soli_tab_get_instance_private (tab);
 
 	tab->priv->frame = soli_view_frame_new ();
@@ -51,6 +62,9 @@ soli_tab_init (SoliTab *tab)
 						GTK_WIDGET (tab->priv->frame),
 						TRUE, TRUE, 0);
 	gtk_widget_show (GTK_WIDGET (tab->priv->frame));
+
+	doc = soli_tab_get_document (tab);
+	g_object_set_data (G_OBJECT (doc), SOLI_TAB_KEY, tab);
 }
 
 static void
@@ -98,6 +112,39 @@ loader_data_free (LoaderData *data)
 
 		g_slice_free (LoaderData, data);
 	}
+}
+
+static SaverData *
+saver_data_new (void)
+{
+	return g_slice_new0 (SaverData);
+}
+
+static void
+saver_data_free (SaverData *data)
+{
+	if (data != NULL)
+	{
+		if (data->saver != NULL)
+		{
+			g_object_unref (data->saver);
+		}
+
+		if (data->timer != NULL)
+		{
+			g_timer_destroy (data->timer);
+		}
+
+		g_slice_free (SaverData, data);
+	}
+}
+
+SoliTab *
+soli_tab_get_from_document (SoliDocument *doc)
+{
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+
+	return g_object_get_data (G_OBJECT (doc), SOLI_TAB_KEY);
 }
 
 static void
@@ -179,7 +226,7 @@ load_async (SoliTab *tab,
 	g_return_if_fail (G_IS_FILE (location));
 	g_return_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable));
 	
-	doc = soli_tab_get_document (tab); // TODO
+	doc = soli_tab_get_document (tab);
 	file = soli_document_get_file (doc);
 	gtk_source_file_set_location (file, location);
 	
@@ -218,6 +265,109 @@ soli_tab_load (SoliTab *tab,
 				NULL);
 	
 	g_object_unref (cancellable);
+}
+
+gboolean
+soli_tab_save_finish (SoliTab *tab,
+						GAsyncResult *result)
+{
+	g_return_val_if_fail (g_task_is_valid (result, tab), FALSE);
+
+	return g_task_propagate_boolean (G_TASK (result), NULL);
+}
+
+static void
+saver_progress_cb (goffset size,
+					goffset total_size,
+					GTask *save_task)
+{
+//	SoliTab *tab = g_task_get_source_object (save_task);
+//	SaverData *data = g_task_get_task_data (save_task);
+
+	return;
+}
+
+static void
+save_cb (GtkSourceFileSaver *saver,
+		GAsyncResult *result,
+		GTask *save_task)
+{
+	SoliTab *tab = g_task_get_source_object (save_task);
+	SaverData *data = g_task_get_task_data (save_task);
+	SoliDocument *doc = soli_tab_get_document (tab);
+	GFile *location = gtk_source_file_saver_get_location (saver);
+	GError *error = NULL;
+
+	gtk_source_file_saver_save_finish (saver, result, &error);
+
+	if (data->timer != NULL)
+	{
+		g_timer_destroy (data->timer);
+		data->timer = NULL;
+	}
+
+	if (error != NULL)
+	{
+		// TODO
+	}
+	else
+	{
+		g_task_return_boolean (save_task, TRUE);
+		g_object_unref (save_task);
+	}
+
+	if (error != NULL)
+	{
+		g_error_free (error);
+	}
+}
+
+static void
+launch_saver (GTask *save_task)
+{
+	SoliTab *tab = g_task_get_source_object (save_task);
+	SoliDocument *doc = soli_tab_get_document (tab);
+	SaverData *data = g_task_get_task_data (save_task);
+
+	if (data->timer != NULL)
+	{
+		g_timer_destroy (data->timer);
+	}
+	data->timer = g_timer_new ();
+
+	gtk_source_file_saver_save_async (data->saver,
+									G_PRIORITY_DEFAULT,
+									g_task_get_cancellable (save_task),
+									(GFileProgressCallback) saver_progress_cb,
+									save_task,
+									NULL,
+									(GAsyncReadyCallback) save_cb,
+									save_task);
+}
+
+void
+soli_tab_save_async (SoliTab *tab,
+					GCancellable *cancellable,
+					GAsyncReadyCallback callback,
+					gpointer user_data)
+{
+	SoliDocument *doc;
+	GtkSourceFile *file;
+	GTask *save_task;
+	SaverData *data;
+	
+	g_return_if_fail (SOLI_IS_TAB (tab));
+	
+	doc = soli_tab_get_document (tab);
+	file = soli_document_get_file (doc);
+	
+	save_task = g_task_new (tab, cancellable, callback, user_data);
+	
+	data = saver_data_new ();
+	g_task_set_task_data (save_task, data, (GDestroyNotify) saver_data_free);
+	data->saver = gtk_source_file_saver_new (GTK_SOURCE_BUFFER (doc), file);
+	
+	launch_saver (save_task);
 }
 
 SoliDocument *
