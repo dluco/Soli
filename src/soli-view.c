@@ -70,4 +70,69 @@ soli_view_create_buffer (GtkTextView *text_view)
 	return GTK_TEXT_BUFFER (soli_document_new ());
 }
 
+void
+soli_view_cut_clipboard (SoliView *view)
+{
+	GtkTextBuffer *buffer;
+	GtkClipboard *clipboard;
 
+	g_return_if_fail (SOLI_IS_VIEW (view));
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+
+	clipboard = gtk_widget_get_clipboard (GTK_WIDGET (view),
+										GDK_SELECTION_CLIPBOARD);
+
+	gtk_text_buffer_cut_clipboard (buffer,
+								clipboard,
+								gtk_text_view_get_editable (GTK_TEXT_VIEW (view)));
+
+	gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+								gtk_text_buffer_get_insert (buffer),
+								0.02, // FIXME
+								FALSE,
+								0.0,
+								0.0);
+}
+
+void
+soli_view_copy_clipboard (SoliView *view)
+{
+	GtkTextBuffer *buffer;
+	GtkClipboard *clipboard;
+
+	g_return_if_fail (SOLI_IS_VIEW (view));
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+
+	clipboard = gtk_widget_get_clipboard (GTK_WIDGET (view),
+										GDK_SELECTION_CLIPBOARD);
+
+	gtk_text_buffer_copy_clipboard (buffer, clipboard);
+}
+
+void
+soli_view_paste_clipboard (SoliView *view)
+{
+	GtkTextBuffer *buffer;
+	GtkClipboard *clipboard;
+
+	g_return_if_fail (SOLI_IS_VIEW (view));
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+
+	clipboard = gtk_widget_get_clipboard (GTK_WIDGET (view),
+										GDK_SELECTION_CLIPBOARD);
+
+	gtk_text_buffer_paste_clipboard (buffer,
+								clipboard,
+								NULL,
+								gtk_text_view_get_editable (GTK_TEXT_VIEW (view)));
+
+	gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+								gtk_text_buffer_get_insert (buffer),
+								0.02, // FIXME
+								FALSE,
+								0.0,
+								0.0);
+}

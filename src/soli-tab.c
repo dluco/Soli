@@ -370,6 +370,14 @@ soli_tab_save_async (SoliTab *tab,
 	launch_saver (save_task);
 }
 
+SoliView *
+soli_tab_get_view (SoliTab *tab)
+{
+	g_return_val_if_fail (SOLI_IS_TAB (tab), NULL);
+
+	return soli_view_frame_get_view (tab->priv->frame);
+}
+
 SoliDocument *
 soli_tab_get_document (SoliTab *tab)
 {

@@ -24,6 +24,7 @@
 #include "soli-commands.h"
 #include "soli-window.h"
 #include "soli-tab.h"
+#include "soli-view.h"
 #include "soli-document.h"
 #include <gtk/gtk.h>
 
@@ -141,18 +142,60 @@ soli_cmd_save (GSimpleAction *action,
 }
 
 void
-soli_cmd_preferences (GSimpleAction *action,
-                       GVariant      *parameter,
-                       gpointer       app)
-{
-}
-
-void
 soli_cmd_quit (GSimpleAction *action,
                 GVariant      *parameter,
                 gpointer       app)
 {
 	g_application_quit (G_APPLICATION (app));
+}
+
+void
+soli_cmd_cut (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	SoliWindow *window = SOLI_WINDOW (user_data);
+	SoliView *view = soli_window_get_active_view (window);
+
+	g_return_if_fail (view != NULL);
+
+	soli_view_cut_clipboard (view);
+	gtk_widget_grab_focus (GTK_WIDGET (view));
+}
+
+void
+soli_cmd_copy (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	SoliWindow *window = SOLI_WINDOW (user_data);
+	SoliView *view = soli_window_get_active_view (window);
+
+	g_return_if_fail (view != NULL);
+
+	soli_view_copy_clipboard (view);
+	gtk_widget_grab_focus (GTK_WIDGET (view));
+}
+
+void
+soli_cmd_paste (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data)
+{
+	SoliWindow *window = SOLI_WINDOW (user_data);
+	SoliView *view = soli_window_get_active_view (window);
+
+	g_return_if_fail (view != NULL);
+
+	soli_view_paste_clipboard (view);
+	gtk_widget_grab_focus (GTK_WIDGET (view));
+}
+
+void
+soli_cmd_preferences (GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       app)
+{
 }
 
 void

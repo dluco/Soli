@@ -54,6 +54,13 @@ GType soli_view_get_type (void) G_GNUC_CONST;
 
 GtkWidget *soli_view_new (SoliDocument *doc);
 
+void
+soli_view_cut_clipboard (SoliView *view);
+void
+soli_view_copy_clipboard (SoliView *view);
+void
+soli_view_paste_clipboard (SoliView *view);
+
 G_END_DECLS
 
 #endif /* _SOLI_VIEW_H_ */

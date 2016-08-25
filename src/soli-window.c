@@ -21,6 +21,7 @@
 #include "soli-window.h"
 #include "soli-notebook.h"
 #include "soli-tab.h"
+#include "soli-view.h"
 #include "soli-commands.h"
 
 struct _SoliWindowPrivate
@@ -32,7 +33,10 @@ G_DEFINE_TYPE_WITH_PRIVATE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW
 
 static GActionEntry win_entries[] = {
 	{ "open", soli_cmd_open },
-	{ "save", soli_cmd_save }
+	{ "save", soli_cmd_save },
+	{ "cut", soli_cmd_cut },
+	{ "copy", soli_cmd_copy },
+	{ "paste", soli_cmd_paste },
 };
 
 static void
@@ -78,6 +82,20 @@ soli_window_get_active_tab (SoliWindow *window)
 	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
 
 	return soli_notebook_get_active_tab (window->priv->notebook);
+}
+
+SoliView *
+soli_window_get_active_view (SoliWindow *window)
+{
+	SoliTab *tab;
+
+	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
+
+	tab = soli_window_get_active_tab (window);
+
+	g_return_val_if_fail (tab != NULL, NULL);
+
+	return soli_tab_get_view (tab);
 }
 
 static SoliTab *

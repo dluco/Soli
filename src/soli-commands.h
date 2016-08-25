@@ -26,6 +26,19 @@ void soli_cmd_open (GSimpleAction *action, GVariant *parameter, gpointer window)
 
 void soli_cmd_save (GSimpleAction *action, GVariant *parameter, gpointer window);
 
+void
+soli_cmd_cut (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data);
+void
+soli_cmd_copy (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data);
+void
+soli_cmd_paste (GSimpleAction *action,
+			   GVariant      *parameter,
+			   gpointer       user_data);
+
 void soli_cmd_preferences (GSimpleAction *action, GVariant *parameter, gpointer app);
 
 void soli_cmd_quit (GSimpleAction *action, GVariant *parameter, gpointer app);

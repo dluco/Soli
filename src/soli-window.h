@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include "soli-app.h"
 #include "soli-tab.h"
+#include "soli-view.h"
 
 G_BEGIN_DECLS
 
@@ -55,6 +56,9 @@ SoliWindow *soli_window_new (SoliApp *app);
 
 SoliTab *
 soli_window_get_active_tab (SoliWindow *window);
+
+SoliView *
+soli_window_get_active_view (SoliWindow *window);
 
 void soli_window_open (SoliWindow *win, GFile *file);
 

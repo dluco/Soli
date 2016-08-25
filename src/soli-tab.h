@@ -21,6 +21,7 @@
 #define _SOLI_TAB_H_
 
 #include <gtk/gtk.h>
+#include "soli-view.h"
 #include "soli-document.h"
 
 G_BEGIN_DECLS
@@ -67,7 +68,10 @@ soli_tab_save_async (SoliTab *tab,
 					GAsyncReadyCallback callback,
 					gpointer user_data);
 
-SoliDocument *soli_tab_get_document (SoliTab *tab);
+SoliView *
+soli_tab_get_view (SoliTab *tab);
+SoliDocument *
+soli_tab_get_document (SoliTab *tab);
 
 G_END_DECLS
 
