@@ -142,6 +142,35 @@ soli_cmd_save (GSimpleAction *action,
 }
 
 void
+soli_cmd_close_tab (SoliTab *tab,
+					SoliWindow *window)
+{
+	/* Ensure window is the tab's top-level container */
+	g_return_if_fail (GTK_WIDGET (window) == gtk_widget_get_toplevel (GTK_WIDGET (tab)));
+	
+	// TODO: check if tab has unsaved changes
+	
+	soli_window_close_tab (window, tab);
+}
+
+void
+soli_cmd_close (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
+{
+	SoliWindow *window = SOLI_WINDOW (user_data);
+	SoliTab *active_tab;
+	
+	active_tab = soli_window_get_active_tab (window);
+	if (active_tab == NULL)
+	{
+		gtk_widget_destroy (GTK_WIDGET (window));
+		return;
+	}
+	soli_cmd_close_tab (active_tab, window);
+}
+
+void
 soli_cmd_quit (GSimpleAction *action,
                 GVariant      *parameter,
                 gpointer       app)

@@ -62,6 +62,10 @@ soli_window_get_active_view (SoliWindow *window);
 
 void soli_window_open (SoliWindow *win, GFile *file);
 
+void
+soli_window_close_tab (SoliWindow *window,
+						SoliTab *tab);
+
 G_END_DECLS
 
 #endif /* _SOLI_WINDOW_H_ */

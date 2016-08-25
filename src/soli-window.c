@@ -34,6 +34,8 @@ G_DEFINE_TYPE_WITH_PRIVATE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW
 static GActionEntry win_entries[] = {
 	{ "open", soli_cmd_open },
 	{ "save", soli_cmd_save },
+	{ "close", soli_cmd_close },
+	
 	{ "cut", soli_cmd_cut },
 	{ "copy", soli_cmd_copy },
 	{ "paste", soli_cmd_paste },
@@ -68,12 +70,12 @@ soli_window_new (SoliApp *app)
 	return g_object_new (SOLI_TYPE_WINDOW, "application", app, NULL);
 }
 
-GtkWidget *
+SoliNotebook *
 soli_window_get_notebook (SoliWindow *window)
 {
 	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
 
-	return GTK_WIDGET (window->priv->notebook);
+	return window->priv->notebook;
 }
 
 SoliTab *
@@ -121,7 +123,7 @@ soli_window_new_tab_from_location (SoliWindow *window,
 										GFile *location)
 {
 	SoliTab *tab;
-	GtkWidget *notebook;
+	SoliNotebook *notebook;
 	
 	g_return_val_if_fail (SOLI_IS_WINDOW (window), NULL);
 	g_return_val_if_fail (G_IS_FILE (location), NULL);
@@ -132,51 +134,28 @@ soli_window_new_tab_from_location (SoliWindow *window,
 	
 	notebook = soli_window_get_notebook (window);
 	
-	return process_new_tab (window, SOLI_NOTEBOOK (notebook), tab);
+	return process_new_tab (window, notebook, tab);
 }
 
 void
 soli_window_open (SoliWindow *window, GFile *file)
 {
-	soli_window_new_tab_from_location(window, file);
+	g_return_if_fail (SOLI_IS_WINDOW (window));
+	g_return_if_fail (G_IS_FILE (file));
 	
-//	SoliWindowPrivate *priv;
-//	GtkWidget *scrolled, *view, *label;
-//	gchar *basename, *contents;
-//	gsize length;
-//	
-//	g_return_if_fail (SOLI_IS_WINDOW (window));
-//	g_return_if_fail (G_IS_FILE (file));
-//
-//	priv = soli_window_get_instance_private (window);
-//	basename = g_file_get_basename (file);
-//
-//	scrolled = gtk_scrolled_window_new (NULL, NULL);
-//	view = gtk_text_view_new ();
-//	label = gtk_label_new (basename);
-//
-//	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),
-//	                                GTK_POLICY_AUTOMATIC,
-//	                                GTK_POLICY_AUTOMATIC);
-//	
-//	gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
-//	gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
-//	
-//	gtk_container_add (GTK_CONTAINER (scrolled), view);
-//
-//	gtk_notebook_append_page (GTK_NOTEBOOK (priv->notebook),
-//	                          scrolled, label);
-//
-//	if (g_file_load_contents (file, NULL, &contents, &length, NULL, NULL))
-//	{
-//		GtkTextBuffer *buffer;
-//
-//		buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-//		gtk_text_buffer_set_text (buffer, contents, length);
-//		g_free (contents);
-//	}
-//
-//	gtk_widget_show_all (scrolled);
-//
-//	g_free (basename);
+	soli_window_new_tab_from_location(window, file);
+}
+
+void
+soli_window_close_tab (SoliWindow *window,
+						SoliTab *tab)
+{
+	SoliNotebook *notebook;
+	
+	g_return_if_fail (SOLI_IS_WINDOW (window));
+	g_return_if_fail (SOLI_IS_TAB (tab));
+	
+	notebook = soli_window_get_notebook (window);
+	
+	soli_notebook_close_tab (notebook, tab);
 }

@@ -108,3 +108,20 @@ soli_notebook_add_tab (SoliNotebook *notebook,
 								position);
 }
 
+void
+soli_notebook_close_tab (SoliNotebook *notebook,
+						SoliTab *tab)
+{
+	gint n;
+	
+	g_return_if_fail (SOLI_IS_NOTEBOOK (notebook));
+	g_return_if_fail (SOLI_IS_TAB (tab));
+	
+	n = gtk_notebook_page_num (GTK_NOTEBOOK (notebook),
+									GTK_WIDGET (tab));
+									
+	if (n != -1)
+	{
+		gtk_notebook_remove_page (GTK_NOTEBOOK (notebook), n);
+	}
+}
