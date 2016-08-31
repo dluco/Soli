@@ -20,7 +20,7 @@
 #ifndef _SOLI_DOCUMENT_H_
 #define _SOLI_DOCUMENT_H_
 
-//#include <gtk/gtk.h>
+#include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
@@ -46,6 +46,10 @@ struct _SoliDocument
 struct _SoliDocumentClass
 {
 	GtkSourceBufferClass parent_class;
+
+	/* Signals */
+	void (* load) (SoliDocument *doc);
+	void (* loaded) (SoliDocument *doc);
 };
 
 GType soli_document_get_type (void) G_GNUC_CONST;
@@ -53,6 +57,12 @@ SoliDocument *soli_document_new (void);
 
 GtkSourceFile *soli_document_get_file (SoliDocument *doc);
 GFile *soli_document_get_location (SoliDocument *doc);
+
+gboolean
+soli_document_is_untouched (SoliDocument *doc);
+
+gboolean
+soli_document_is_untitled (SoliDocument *doc);
 
 G_END_DECLS
 

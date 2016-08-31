@@ -2,7 +2,6 @@
 <interface>
   <requires lib="gtk+" version="3.8"/>
   <template class="SoliWindow" parent="GtkApplicationWindow">
-    <property name="title" translatable="yes">Test Window</property>
     <property name="default_width">600</property>
     <property name="default_height">400</property>
     <child>

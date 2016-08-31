@@ -158,12 +158,33 @@ loader_progress_cb (goffset size,
 	return;
 }
 
+// TODO
+static void
+successful_load (GTask *load_task)
+{
+	SoliTab *tab = g_task_get_source_object (load_task);
+	SoliDocument *doc = soli_tab_get_document (tab);
+
+	g_signal_emit_by_name (doc, "loaded");
+}
+
+// TODO: add tab states (loading, saving, etc.)
 static void
 load_cb (GtkSourceFileLoader *loader,
 		GAsyncResult *result,
 		GTask *load_task)
 {
-	return;
+	GError *error = NULL;
+
+	gtk_source_file_loader_load_finish (loader, result, &error);
+
+//	if (data->timer != NULL)
+//	{
+//		g_timer_destroy (data->timer);
+//		data->timer = NULL;
+//	}
+
+	successful_load (load_task);
 }
 
 static void
