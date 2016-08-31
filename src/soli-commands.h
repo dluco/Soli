@@ -21,10 +21,21 @@
 #define _SOLI_COMMANDS_
 
 #include <gtk/gtk.h>
+#include "soli-window.h"
+#include "soli-tab.h"
 
 void soli_cmd_open (GSimpleAction *action, GVariant *parameter, gpointer window);
 
 void soli_cmd_save (GSimpleAction *action, GVariant *parameter, gpointer window);
+
+void
+soli_cmd_close_tab (SoliTab *tab,
+					SoliWindow *window);
+
+void
+soli_cmd_close (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data);
 
 void
 soli_cmd_cut (GSimpleAction *action,

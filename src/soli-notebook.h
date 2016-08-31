@@ -57,6 +57,10 @@ SoliTab *soli_notebook_get_active_tab (SoliNotebook *notebook);
 void soli_notebook_add_tab (SoliNotebook *notebook,
 							SoliTab *tab,
 							gint position);
+							
+void
+soli_notebook_close_tab (SoliNotebook *notebook,
+						SoliTab *tab);
 
 G_END_DECLS
 

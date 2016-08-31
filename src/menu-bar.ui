@@ -20,6 +20,13 @@
 			</section>
 			<section>
 				<item>
+					<attribute name="label" translatable="yes">_Close</attribute>
+					<attribute name="action">win.close</attribute>
+					<attribute name="accel">&lt;Primary&gt;W</attribute>
+				</item>
+			</section>
+			<section>
+				<item>
 					<attribute name="label" translatable="yes">_Quit</attribute>
 					<attribute name="action">app.quit</attribute>
 					<attribute name="accel">&lt;Primary&gt;Q</attribute>
