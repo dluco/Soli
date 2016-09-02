@@ -22,11 +22,13 @@
 #endif
 
 #include "soli-commands.h"
+
+#include <gtk/gtk.h>
+
 #include "soli-window.h"
 #include "soli-tab.h"
 #include "soli-view.h"
 #include "soli-document.h"
-#include <gtk/gtk.h>
 
 void
 soli_cmd_open (GSimpleAction *action,
@@ -104,7 +106,19 @@ save_document_async (SoliDocument *doc,
 	tab = soli_tab_get_from_document (doc);
 	file = soli_document_get_file (doc);
 
-	// TODO: what if file is untitled?
+	if (soli_document_is_untitled (doc) ||
+			gtk_source_file_is_readonly (file))
+	{
+		/* Document must be saved via "Save As..." */
+		// TODO
+//		save_as_tab_async (tab,
+//							window,
+//							cancellable,
+//							(GAsyncReadyCallback) save_as_tab_ready_cb,
+//							task);
+
+		return;
+	}
 
 	soli_tab_save_async (tab,
 						cancellable,

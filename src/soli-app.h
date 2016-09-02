@@ -21,27 +21,27 @@
 #define _SOLI_APP_
 
 #include <gtk/gtk.h>
+#include "soli-window.h"
 
 G_BEGIN_DECLS
 
 #define SOLI_TYPE_APP             (soli_app_get_type ())
-#define SOLI_APP(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), SOLI_TYPE_APP, SoliApp))
 
-typedef struct _SoliApp SoliApp;
-typedef struct _SoliAppClass SoliAppClass;
+G_DECLARE_DERIVABLE_TYPE (SoliApp, soli_app, SOLI, APP, GtkApplication)
 
 struct _SoliAppClass
 {
 	GtkApplicationClass parent_class;
-};
 
-struct _SoliApp
-{
-	GtkApplication parent;
+	SoliWindow *(*create_window)	(SoliApp *app);
 };
 
 GType soli_app_get_type (void) G_GNUC_CONST;
 SoliApp *soli_app_new (void);
+
+SoliWindow *soli_app_get_active_window (SoliApp *app);
+
+SoliWindow *soli_app_create_window (SoliApp *app, GdkScreen *screen);
 
 /* Callbacks */
 

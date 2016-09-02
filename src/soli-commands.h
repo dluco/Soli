@@ -22,7 +22,8 @@
 
 #include <gtk/gtk.h>
 #include "soli-window.h"
-#include "soli-tab.h"
+
+G_BEGIN_DECLS
 
 void soli_cmd_open (GSimpleAction *action, GVariant *parameter, gpointer window);
 
@@ -55,5 +56,7 @@ void soli_cmd_preferences (GSimpleAction *action, GVariant *parameter, gpointer 
 void soli_cmd_quit (GSimpleAction *action, GVariant *parameter, gpointer app);
 
 void soli_cmd_about (GSimpleAction *action, GVariant *parameter, gpointer app);
+
+G_END_DECLS
 
 #endif /* _SOLI_COMMANDS_ */

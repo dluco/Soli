@@ -21,7 +21,6 @@
 #define _SOLI_WINDOW_H_
 
 #include <gtk/gtk.h>
-#include "soli-app.h"
 #include "soli-tab.h"
 #include "soli-view.h"
 
@@ -52,7 +51,6 @@ struct _SoliWindowClass
 
 
 GType soli_window_get_type (void) G_GNUC_CONST;
-SoliWindow *soli_window_new (SoliApp *app);
 
 SoliTab *
 soli_window_get_active_tab (SoliWindow *window);

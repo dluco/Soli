@@ -64,12 +64,6 @@ soli_window_class_init (SoliWindowClass *klass)
 	                                              SoliWindow, notebook);
 }
 
-SoliWindow *
-soli_window_new (SoliApp *app)
-{
-	return g_object_new (SOLI_TYPE_WINDOW, "application", app, NULL);
-}
-
 SoliNotebook *
 soli_window_get_notebook (SoliWindow *window)
 {
