@@ -19,6 +19,8 @@
 
 #include "soli-document.h"
 
+#include <string.h>
+
 static gchar *get_default_content_type (void);
 static void on_content_type_changed (SoliDocument *doc, GParamSpec *pspec, gpointer empty);
 static void soli_document_loaded_real (SoliDocument *doc);
@@ -109,7 +111,7 @@ get_content_type_from_content (SoliDocument *doc)
 	data = gtk_text_buffer_get_text (buffer, &start, &end, TRUE);
 
 	content_type = g_content_type_guess (NULL,
-										(const gchar *)data,
+										(const guchar *)data,
 										strlen (data),
 										NULL);
 
@@ -232,7 +234,7 @@ soli_document_get_mimetype (SoliDocument *doc)
 static void
 soli_document_set_property (GObject *object,
 							guint prop_id,
-							GValue *value,
+							const GValue *value,
 							GParamSpec *pspec)
 {
 	SoliDocument *doc = SOLI_DOCUMENT (object);
@@ -241,7 +243,7 @@ soli_document_set_property (GObject *object,
 	switch (prop_id)
 	{
 		case PROP_CONTENT_TYPE:
-			g_value_take_string (value, soli_document_get_content_type (doc));
+			g_value_take_string ((GValue *)value, soli_document_get_content_type (doc));
 			break;
 
 		default:
@@ -347,7 +349,7 @@ soli_document_is_untouched (SoliDocument *doc)
 	SoliDocumentPrivate *priv;
 	GFile *location;
 
-	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), TRUE);
 	
 	priv = soli_document_get_instance_private (doc);
 	location = gtk_source_file_get_location (priv->file);
@@ -360,11 +362,38 @@ soli_document_is_untitled (SoliDocument *doc)
 {
 	SoliDocumentPrivate *priv;
 
-	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), NULL);
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), TRUE);
 	
 	priv = soli_document_get_instance_private (doc);
 
 	return gtk_source_file_get_location (priv->file) == NULL;
+}
+
+gboolean
+soli_document_needs_saving (SoliDocument *doc)
+{
+	SoliDocumentPrivate *priv;
+	gboolean externally_modified = FALSE;
+	gboolean deleted = FALSE;
+
+	g_return_val_if_fail (SOLI_IS_DOCUMENT (doc), FALSE);
+
+	priv = soli_document_get_instance_private (doc);
+
+	if (gtk_text_buffer_get_modified (GTK_TEXT_BUFFER (doc)))
+	{
+		return TRUE;
+	}
+
+	if (gtk_source_file_is_local (priv->file))
+	{
+		gtk_source_file_check_file_on_disk (priv->file);
+		externally_modified = gtk_source_file_is_externally_modified (priv->file);
+		deleted = gtk_source_file_is_deleted (priv->file);
+	}
+
+	// TODO: check create flag
+	return (externally_modified || deleted);
 }
 
 static void

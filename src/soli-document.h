@@ -58,11 +58,11 @@ SoliDocument *soli_document_new (void);
 GtkSourceFile *soli_document_get_file (SoliDocument *doc);
 GFile *soli_document_get_location (SoliDocument *doc);
 
-gboolean
-soli_document_is_untouched (SoliDocument *doc);
+gboolean soli_document_is_untouched (SoliDocument *doc);
 
-gboolean
-soli_document_is_untitled (SoliDocument *doc);
+gboolean soli_document_is_untitled (SoliDocument *doc);
+
+gboolean soli_document_needs_saving (SoliDocument *doc);
 
 G_END_DECLS
 

@@ -155,6 +155,24 @@ soli_cmd_save (GSimpleAction *action,
 	}
 }
 
+static gboolean
+tab_can_close (SoliTab *tab,
+				GtkWindow *window)
+{
+	SoliDocument *doc;
+
+	doc = soli_tab_get_document (tab);
+
+	if (!soli_tab_can_close (tab))
+	{
+		// TODO: close confirmation dialog
+		
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 void
 soli_cmd_close_tab (SoliTab *tab,
 					SoliWindow *window)
@@ -162,9 +180,11 @@ soli_cmd_close_tab (SoliTab *tab,
 	/* Ensure window is the tab's top-level container */
 	g_return_if_fail (GTK_WIDGET (window) == gtk_widget_get_toplevel (GTK_WIDGET (tab)));
 	
-	// TODO: check if tab has unsaved changes
-	
-	soli_window_close_tab (window, tab);
+	/* Check if tab has unsaved changes, etc. */
+	if (tab_can_close (tab, GTK_WINDOW (window)))
+	{
+		soli_window_close_tab (window, tab);
+	}
 }
 
 void

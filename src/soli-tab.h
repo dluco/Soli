@@ -73,6 +73,9 @@ soli_tab_get_view (SoliTab *tab);
 SoliDocument *
 soli_tab_get_document (SoliTab *tab);
 
+gboolean
+soli_tab_can_close (SoliTab *tab);
+
 G_END_DECLS
 
 #endif /* _SOLI_TAB_H_ */

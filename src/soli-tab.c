@@ -414,3 +414,21 @@ soli_tab_get_document (SoliTab *tab)
 	return SOLI_IS_DOCUMENT (buffer) ? SOLI_DOCUMENT (buffer) : NULL;
 }
 
+gboolean
+soli_tab_can_close (SoliTab *tab)
+{
+	SoliDocument *doc;
+
+	g_return_val_if_fail (SOLI_IS_TAB (tab), FALSE);
+
+	// TODO: check tab state
+	
+	doc = soli_tab_get_document (tab);
+
+	if (soli_document_needs_saving (doc))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
