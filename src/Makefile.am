@@ -43,11 +43,15 @@ soli_LDFLAGS = \
 
 soli_LDADD = $(SOLI_LIBS)
 
-soli-resources.c: soli.gresource.xml $(UI_FILES)
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name soli $(srcdir)/soli.gresource.xml
+soli_resource_deps = $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/resources --sourcedir $(builddir)/resources $(builddir)/resources/soli.gresource.xml)
 
-soli-resources.h: soli.gresource.xml
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name soli $(srcdir)/soli.gresource.xml
+soli_resource_c_deps = $(builddir)/resources/soli.gresource.xml $(soli_resource_deps)
+
+soli-resources.c: $(soli_resource_c_deps)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/resources --sourcedir=$(builddir)/resources --generate-source --c-name soli $(srcdir)/resources/soli.gresource.xml
+
+soli-resources.h: $(soli_resource_c_deps)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/resources --sourcedir=$(builddir)/resources --generate-header --c-name soli $(srcdir)/resources/soli.gresource.xml
 
 BUILT_SOURCES = \
 	soli-resources.c \

@@ -204,6 +204,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GLIB_COMPILE_RESOURCES = @GLIB_COMPILE_RESOURCES@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -337,6 +338,8 @@ soli_LDFLAGS = \
 	-Wl,--export-dynamic
 
 soli_LDADD = $(SOLI_LIBS)
+soli_resource_deps = $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/resources --sourcedir $(builddir)/resources $(builddir)/resources/soli.gresource.xml)
+soli_resource_c_deps = $(builddir)/resources/soli.gresource.xml $(soli_resource_deps)
 BUILT_SOURCES = \
 	soli-resources.c \
 	soli-resources.h
@@ -698,11 +701,11 @@ uninstall-am: uninstall-binPROGRAMS
 .PRECIOUS: Makefile
 
 
-soli-resources.c: soli.gresource.xml $(UI_FILES)
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name soli $(srcdir)/soli.gresource.xml
+soli-resources.c: $(soli_resource_c_deps)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/resources --sourcedir=$(builddir)/resources --generate-source --c-name soli $(srcdir)/resources/soli.gresource.xml
 
-soli-resources.h: soli.gresource.xml
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name soli $(srcdir)/soli.gresource.xml
+soli-resources.h: $(soli_resource_c_deps)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/resources --sourcedir=$(builddir)/resources --generate-header --c-name soli $(srcdir)/resources/soli.gresource.xml
 
 dist-hook:
 	cd $(distdir); rm -f $(CLEANFILES)

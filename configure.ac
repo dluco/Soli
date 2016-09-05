@@ -18,6 +18,7 @@ PKG_CHECK_MODULES(SOLI, [
 	gtksourceview-3.0 >= 3.20.3
 ])
 
+AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
 AC_OUTPUT([
 Makefile
