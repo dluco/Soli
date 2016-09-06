@@ -391,6 +391,35 @@ soli_tab_save_async (SoliTab *tab,
 	launch_saver (save_task);
 }
 
+void
+soli_tab_save_as_async (SoliTab *tab,
+						GFile *location,
+						GCancellable *cancellable,
+						GAsyncReadyCallback callback,
+						gpointer user_data)
+{
+	GTask *save_task;
+	SoliDocument *doc;
+	GtkSourceFile *file;
+	SaverData *data;
+
+	g_return_if_fail (SOLI_IS_TAB (tab));
+
+	save_task = g_task_new (tab, cancellable, callback, user_data);
+
+	data = saver_data_new ();
+	g_task_set_task_data (save_task, data, (GDestroyNotify) saver_data_free);
+
+	doc = soli_tab_get_document (tab);
+	file = soli_document_get_file (doc);
+
+	data->saver = gtk_source_file_saver_new_with_target (GTK_SOURCE_BUFFER (doc),
+														file,
+														location);
+
+	launch_saver (save_task);
+}
+
 SoliView *
 soli_tab_get_view (SoliTab *tab)
 {

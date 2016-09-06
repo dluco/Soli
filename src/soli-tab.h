@@ -68,6 +68,13 @@ soli_tab_save_async (SoliTab *tab,
 					GAsyncReadyCallback callback,
 					gpointer user_data);
 
+void
+soli_tab_save_as_async (SoliTab *tab,
+						GFile *location,
+						GCancellable *cancellable,
+						GAsyncReadyCallback callback,
+						gpointer user_data);
+
 SoliView *
 soli_tab_get_view (SoliTab *tab);
 SoliDocument *
