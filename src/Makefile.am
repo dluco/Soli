@@ -23,20 +23,26 @@ soli_SOURCES = \
 	main.c \
 	soli-app.h \
 	soli-app.c \
+	soli-app-activatable.h \
+	soli-app-activatable.c \
 	soli-window.h \
 	soli-window.c \
+	soli-window-activatable.h \
+	soli-window-activatable.c \
 	soli-notebook.h \
 	soli-notebook.c \
-	soli-tab.c \
 	soli-tab.h \
-	soli-view.c \
+	soli-tab.c \
 	soli-view.h \
-	soli-document.c \
+	soli-view.c \
+	soli-view-activatable.h \
+	soli-view-activatable.c \
 	soli-document.h \
-	soli-view-frame.c \
+	soli-document.c \
 	soli-view-frame.h \
-	soli-commands.c \
-	soli-commands.h
+	soli-view-frame.c \
+	soli-commands.h \
+	soli-commands.c
 
 soli_LDFLAGS = \
 	-Wl,--export-dynamic
