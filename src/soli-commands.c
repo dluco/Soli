@@ -24,7 +24,9 @@
 #include "soli-commands.h"
 
 #include <gtk/gtk.h>
+#include <libpeas-gtk/peas-gtk.h>
 
+#include "soli-app.h"
 #include "soli-window.h"
 #include "soli-tab.h"
 #include "soli-view.h"
@@ -422,9 +424,15 @@ soli_cmd_close (GSimpleAction *action,
 void
 soli_cmd_quit (GSimpleAction *action,
                 GVariant      *parameter,
-                gpointer       app)
+                gpointer       user_data)
 {
-	g_application_quit (G_APPLICATION (app));
+	GApplication *app;
+
+	g_return_if_fail (G_IS_APPLICATION (user_data));
+
+	app = G_APPLICATION (user_data);
+
+	g_application_quit (app);
 }
 
 void
@@ -474,6 +482,42 @@ soli_cmd_preferences (GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       app)
 {
+}
+
+void
+soli_cmd_plugins (GSimpleAction *action,
+					GVariant *parameter,
+					gpointer user_data)
+{
+	SoliApp *app;
+	SoliWindow *window;
+	GtkWidget *dialog;
+	GtkWidget *content_area, *plugin_manager;
+
+	app = SOLI_APP (user_data);
+	window = soli_app_get_active_window (app);
+
+	dialog = gtk_dialog_new_with_buttons ("Plugins",
+										GTK_WINDOW (window),
+										GTK_DIALOG_MODAL,
+										"_OK",
+										GTK_RESPONSE_NONE,
+										NULL);
+
+	content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+	plugin_manager = peas_gtk_plugin_manager_new (NULL);
+
+	gtk_container_add (GTK_CONTAINER (content_area), plugin_manager);
+
+	gtk_widget_show_all (content_area);
+
+	gtk_dialog_run (GTK_DIALOG (dialog));
+
+//	gtk_widget_show_all (dialog);
+//	gtk_window_present (GTK_WINDOW (dialog));
+
+	gtk_widget_destroy (dialog);
 }
 
 void

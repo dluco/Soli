@@ -55,6 +55,8 @@ void soli_cmd_preferences (GSimpleAction *action, GVariant *parameter, gpointer 
 
 void soli_cmd_quit (GSimpleAction *action, GVariant *parameter, gpointer app);
 
+void soli_cmd_plugins (GSimpleAction *action, GVariant *parameter, gpointer user_data);
+
 void soli_cmd_about (GSimpleAction *action, GVariant *parameter, gpointer app);
 
 G_END_DECLS

@@ -16,6 +16,8 @@ LT_INIT
 PKG_CHECK_MODULES(SOLI, [
 	gtk+-3.0 >= 2.90.3
 	gtksourceview-3.0 >= 3.20.3
+	libpeas-1.0 >= 1.14-1
+	libpeas-gtk-1.0 >= 1.14-1
 ])
 
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)

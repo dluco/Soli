@@ -22,10 +22,18 @@
 #endif
 
 #include "soli-app.h"
+
+#include <libpeas/peas.h>
+
 #include "soli-window.h"
 #include "soli-commands.h"
 
-G_DEFINE_TYPE (SoliApp, soli_app, GTK_TYPE_APPLICATION);
+typedef struct
+{
+	PeasEngine *engine;
+} SoliAppPrivate;
+
+G_DEFINE_TYPE_WITH_PRIVATE (SoliApp, soli_app, GTK_TYPE_APPLICATION);
 
 static void
 soli_app_init (SoliApp *object)
@@ -35,6 +43,7 @@ soli_app_init (SoliApp *object)
 static GActionEntry app_entries[] = {
 	{ "quit", soli_cmd_quit },
 	{ "preferences", soli_cmd_preferences },
+	{ "plugins", soli_cmd_plugins },
 	{ "about", soli_cmd_about }
 };
 
@@ -67,12 +76,27 @@ open_files (GApplication *app,
 }
 
 static void
+soli_app_dispose (GObject *object)
+{
+	SoliAppPrivate *priv;
+
+	priv = soli_app_get_instance_private (SOLI_APP (object));
+
+	g_clear_object (&priv->engine);
+
+	G_OBJECT_CLASS (soli_app_parent_class)->dispose (object);
+}
+
+static void
 soli_app_startup (GApplication *app)
 {
+	SoliAppPrivate *priv;
 	GtkBuilder *builder;
 	GMenuModel *menu_bar;
 
 	G_APPLICATION_CLASS (soli_app_parent_class)->startup (app);
+
+	priv = soli_app_get_instance_private (SOLI_APP (app));
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 	                                 app_entries, G_N_ELEMENTS (app_entries),
@@ -83,6 +107,8 @@ soli_app_startup (GApplication *app)
 	gtk_application_set_menubar (GTK_APPLICATION (app), menu_bar);
 
 	g_object_unref (builder);
+
+	priv->engine = peas_engine_get_default ();
 }
 
 /* GApplication implementation */
@@ -120,7 +146,7 @@ window_delete_event (SoliWindow *window,
 {
 	// TODO: check window state before closing
 
-	soli_cmd_quit (NULL, NULL, window);
+	soli_cmd_quit (NULL, NULL, app);
 
 	/* Do not destroy the window */
 	return TRUE;
@@ -144,9 +170,14 @@ soli_app_create_window_impl (SoliApp *app)
 static void
 soli_app_class_init (SoliAppClass *klass)
 {
-	G_APPLICATION_CLASS (klass)->startup = soli_app_startup;
-	G_APPLICATION_CLASS (klass)->activate = soli_app_activate;
-	G_APPLICATION_CLASS (klass)->open = soli_app_open;
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	GApplicationClass *app_class = G_APPLICATION_CLASS (klass);
+
+	object_class->dispose = soli_app_dispose;
+
+	app_class->startup = soli_app_startup;
+	app_class->activate = soli_app_activate;
+	app_class->open = soli_app_open;
 
 	klass->create_window = soli_app_create_window_impl;
 }
