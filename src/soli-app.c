@@ -25,12 +25,15 @@
 
 #include <libpeas/peas.h>
 
+#include "soli-app-activatable.h"
 #include "soli-window.h"
 #include "soli-commands.h"
 
 typedef struct
 {
 	PeasEngine *engine;
+
+	PeasExtensionSet *extensions;
 } SoliAppPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliApp, soli_app, GTK_TYPE_APPLICATION);
@@ -46,6 +49,24 @@ static GActionEntry app_entries[] = {
 	{ "plugins", soli_cmd_plugins },
 	{ "about", soli_cmd_about }
 };
+
+static void
+on_extension_added (PeasExtensionSet *extensions,
+				PeasPluginInfo *info,
+				PeasExtension *extension,
+				SoliApp *app)
+{
+	soli_app_activatable_activate (SOLI_APP_ACTIVATABLE (extension));
+}
+
+static void
+on_extension_removed (PeasExtensionSet *extensions,
+				PeasPluginInfo *info,
+				PeasExtension *extension,
+				SoliApp *app)
+{
+	soli_app_activatable_deactivate (SOLI_APP_ACTIVATABLE (extension));
+}
 
 static void
 open_files (GApplication *app,
@@ -82,6 +103,8 @@ soli_app_dispose (GObject *object)
 
 	priv = soli_app_get_instance_private (SOLI_APP (object));
 
+	g_clear_object (&priv->extensions);
+
 	g_clear_object (&priv->engine);
 
 	G_OBJECT_CLASS (soli_app_parent_class)->dispose (object);
@@ -109,6 +132,25 @@ soli_app_startup (GApplication *app)
 	g_object_unref (builder);
 
 	priv->engine = peas_engine_get_default ();
+
+	priv->extensions = peas_extension_set_new (priv->engine,
+											SOLI_TYPE_APP_ACTIVATABLE,
+											"app", SOLI_APP (app),
+											NULL);
+
+	peas_extension_set_foreach (priv->extensions,
+								(PeasExtensionSetForeachFunc) on_extension_added,
+								app);
+
+	g_signal_connect (priv->extensions,
+					"extension-added",
+					G_CALLBACK (on_extension_added),
+					app);
+
+	g_signal_connect (priv->extensions,
+					"extension-removed",
+					G_CALLBACK (on_extension_removed),
+					app);
 }
 
 /* GApplication implementation */

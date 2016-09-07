@@ -17,8 +17,12 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "soli-app.h"
 #include "soli-window.h"
+
+#include <libpeas/peas.h>
+
+#include "soli-window-activatable.h"
+#include "soli-app.h"
 #include "soli-notebook.h"
 #include "soli-tab.h"
 #include "soli-view.h"
@@ -27,6 +31,8 @@
 struct _SoliWindowPrivate
 {
 	SoliNotebook *notebook;
+
+	PeasExtensionSet *extensions;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliWindow, soli_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -42,6 +48,47 @@ static GActionEntry win_entries[] = {
 };
 
 static void
+on_extension_added (PeasExtensionSet *extensions,
+					PeasPluginInfo *info,
+					PeasExtension *extension,
+					SoliWindow *window)
+{
+	soli_window_activatable_activate (SOLI_WINDOW_ACTIVATABLE (extension));
+}
+
+static void
+on_extension_removed (PeasExtensionSet *extensions,
+					PeasPluginInfo *info,
+					PeasExtension *extension,
+					SoliWindow *window)
+{
+	soli_window_activatable_deactivate (SOLI_WINDOW_ACTIVATABLE (extension));
+}
+
+static void
+on_extension_update_state (PeasExtensionSet *extensions,
+					PeasPluginInfo *info,
+					PeasExtension *extension,
+					SoliWindow *window)
+{
+	soli_window_activatable_update_state (SOLI_WINDOW_ACTIVATABLE (extension));
+}
+
+static void
+soli_window_dispose (GObject *object)
+{
+	SoliWindow *window;
+
+	window = SOLI_WINDOW (object);
+
+	g_object_unref (window->priv->extensions);
+
+	peas_engine_garbage_collect (peas_engine_get_default ());
+
+	G_OBJECT_CLASS (soli_window_parent_class)->dispose (object);
+}
+
+static void
 soli_window_init (SoliWindow *window)
 {
 	window->priv = soli_window_get_instance_private (window);
@@ -52,15 +99,39 @@ soli_window_init (SoliWindow *window)
 									win_entries,
 									G_N_ELEMENTS (win_entries),
 									window);
+
+	window->priv->extensions = peas_extension_set_new (peas_engine_get_default (),
+														SOLI_TYPE_WINDOW_ACTIVATABLE,
+														"window", window,
+														NULL);
+
+	peas_extension_set_foreach (window->priv->extensions,
+								(PeasExtensionSetForeachFunc) on_extension_added,
+								window);
+
+	g_signal_connect (window->priv->extensions,
+					"extension-added",
+					G_CALLBACK (on_extension_added),
+					window);
+
+	g_signal_connect (window->priv->extensions,
+					"extension-removed",
+					G_CALLBACK (on_extension_removed),
+					window);
 }
 
 static void
 soli_window_class_init (SoliWindowClass *klass)
 {
-	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass),
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+	object_class->dispose = soli_window_dispose;
+
+	gtk_widget_class_set_template_from_resource (widget_class,
 	                                             "/org/gnome/soli/soli-window.ui");
 
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass),
+	gtk_widget_class_bind_template_child_private (widget_class,
 	                                              SoliWindow, notebook);
 }
 
