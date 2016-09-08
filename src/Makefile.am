@@ -1,25 +1,34 @@
-## Process this file with automake to produce Makefile.in
+# Process this file with automake to produce Makefile.in
 
-## Created by Anjuta
+#NULL =
+AM_CPPFLAGS =
+AM_CFLAGS =
+BUILT_SOURCES =
+CLEANFILES =
+EXTRA_DIST =
+DISTCLEANFILES =
+lib_LTLIBRARIES =
+bin_PROGRAMS =
 
-AM_CPPFLAGS = \
+bin_PROGRAMS += soli
+
+AM_CPPFLAGS += \
+	$(SOLI_CFLAGS) \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
 	-DDATADIR=\""$(datadir)"\" \
 	-DLIBDIR=\""$(libdir)"\" \
-	$(SOLI_CFLAGS)
+	$(NULL)
 
-AM_CFLAGS =\
-	 -Wall\
-	 -g
+AM_CFLAGS += \
+	$(SOLI_CFLAGS) \
+	$(NULL)
+	 
+#soli_LDFLAGS = \
+#	-Wl,--export-dynamic
 
-bin_PROGRAMS = soli
-
-UI_FILES = \
-	soli-window.ui \
-	soli-view-frame.ui \
-	menu-bar.ui
+soli_LDADD = $(SOLI_LIBS)
 
 soli_SOURCES = \
 	main.c \
@@ -46,12 +55,31 @@ soli_SOURCES = \
 	soli-commands.h \
 	soli-commands.c \
 	soli-dirs.h \
-	soli-dirs.c
+	soli-dirs.c \
+	$(NULL)
+	
+UI_FILES = \
+	soli-window.ui \
+	soli-view-frame.ui \
+	menu-bar.ui \
+	$(NULL)
 
-soli_LDFLAGS = \
-	-Wl,--export-dynamic
+BUILT_SOURCES += \
+	soli-resources.c \
+	soli-resources.h \
+	$(NULL)
 
-soli_LDADD = $(SOLI_LIBS)
+CLEANFILES += \
+	$(BUILT_SOURCES) \
+	$(NULL)
+
+EXTRA_DIST += \
+	$(UI_FILES) \
+	$(NULL)
+
+lib_LTLIBRARIES += libsoli-1.0.la
+libsoli_1_0_la_LIBADD = $(SOLI_LIBS)
+libsoli_1_0_la_SOURCES = $(soli_SOURCES)
 
 soli_resource_deps = $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/resources --sourcedir $(builddir)/resources $(builddir)/resources/soli.gresource.xml)
 
@@ -63,18 +91,31 @@ soli-resources.c: $(soli_resource_c_deps)
 soli-resources.h: $(soli_resource_c_deps)
 	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(srcdir)/resources --sourcedir=$(builddir)/resources --generate-header --c-name soli $(srcdir)/resources/soli.gresource.xml
 
-BUILT_SOURCES = \
-	soli-resources.c \
-	soli-resources.h
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --warn-all --verbose
+INTROSPECTION_COMPILER_ARGS = --include-dir=$(srcdir)
 
-nodist_soli_SOURCES = \
-	$(BUILT_SOURCES)
+if HAVE_INTROSPECTION
+introspection_sources = $(libsoli_1_0_la_SOURCES)
 
-CLEANFILES = \
-	$(BUILT_SOURCES)
+Soli_1_0_gir_NAMESPACE = Soli
+Soli_1_0_gir_VERSION = 1.0
+Soli_1_0_gir_PROGRAM = $(builddir)/soli
 
-EXTRA_DIST = \
-	$(UI_FILES)
+Soli-1.0.gir: libsoli-1.0.la
+Soli_1_0_gir_INCLUDES = GObject-2.0
+Soli_1_0_gir_CFLAGS = $(AM_CPPFLAGS)
+Soli_1_0_gir_LIBS = libsoli-1.0.la
+Soli_1_0_gir_FILES = $(introspection_sources)
 
-dist-hook:
-	cd $(distdir); rm -f $(CLEANFILES)
+INTROSPECTION_GIRS += Soli-1.0.gir
+
+girdir = $(datadir)/gir-1.0
+gir_DATA = $(INTROSPECTION_GIRS)
+
+typelibdir = $(libdir)/girepository-1.0
+typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+CLEANFILES += $(gir_DATA) $(typelib_DATA)
+endif
