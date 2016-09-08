@@ -27,16 +27,24 @@ PKG_PROG_PKG_CONFIG
 # Checks for typedefs, structures, and compiler characteristics
 AC_PROG_CC_STDC
 
-SOLI_CFLAGS="-Wall -g"
-SOLI_LIBS=""
+AC_SUBST(SOLI_CFLAGS)
+AC_SUBST(SOLI_LIBS)
 
 # Checks for library dependencies
 PKG_CHECK_MODULES([SOLI], [
-	gtk+-3.0 >= 2.90.3
-	gtksourceview-3.0 >= 3.20.3
-	libpeas-1.0 >= 1.14-1
-	libpeas-gtk-1.0 >= 1.14-1
+	glib-2.0 >= 2.44.0
+	gio-2.0 >= 2.44.0
+	gmodule-2.0 >= 2.0.0
+	gtk+-3.0 >= 3.4.0
+	gtksourceview-3.0 >= 3.19.4
+	libpeas-1.0 >= 1.0.0
+	libpeas-gtk-1.0 >= 1.0.0
 ])
+
+#	gobject-introspection-1.0
+
+AC_SUBST(SOLI_CFLAGS)
+AC_SUBST(SOLI_LIBS)
 
 # Initialize libtool
 LT_PREREQ([2.2.6])
@@ -53,15 +61,12 @@ AC_SUBST(SOLI_MICRO_VERSION)
 AC_SUBST(SOLI_VERSION)
 
 # Introspection
-GOBJECT_INTROSPECTION_CHECK([1.38.0])
+#GOBJECT_INTROSPECTION_CHECK([1.38.0])
 
 # Misc
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
 # Output
-AC_SUBST(SOLI_CFLAGS)
-AC_SUBST(SOLI_LIBS)
-
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
