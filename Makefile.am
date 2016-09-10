@@ -14,6 +14,14 @@ dist_doc_DATA = \
 	INSTALL \
 	NEWS
 
+plugindir = $(pkglibdir)/plugins
+plugin_DATA = \
+	plugins/demo-plugin.plugin \
+	plugins/demo-plugin.py
+
+EXTRA_DIST = \
+	$(plugin_DATA)
+
 # Remove doc directory on uninstall
 uninstall-local:
 	-rm -r $(docdir)

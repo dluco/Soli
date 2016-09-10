@@ -40,7 +40,8 @@ soli_plugins_engine_init (SoliPluginsEngine *engine)
 	gchar *typelib_dir;
 	GError *error = NULL;
 
-	peas_engine_enable_loader (PEAS_ENGINE (engine), "python3");
+	peas_engine_enable_loader (PEAS_ENGINE (engine), "python");
+//	peas_engine_enable_loader (PEAS_ENGINE (engine), "python3");
 
 	engine->plugin_settings = g_settings_new ("ca.dluco.soli.plugins");
 
