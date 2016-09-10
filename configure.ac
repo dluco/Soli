@@ -61,14 +61,17 @@ AC_SUBST(SOLI_MICRO_VERSION)
 AC_SUBST(SOLI_VERSION)
 
 # Introspection
-#GOBJECT_INTROSPECTION_CHECK([1.38.0])
+GOBJECT_INTROSPECTION_CHECK([1.38.0])
 
 # Misc
+GLIB_GSETTINGS
+
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
 # Output
 AC_CONFIG_FILES([
 	Makefile
+	data/Makefile
 	src/Makefile
 ])
 

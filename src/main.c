@@ -17,20 +17,42 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <gtk/gtk.h>
+#include <girepository.h>
+
 #include "soli-app.h"
 
 int
 main (int argc, char *argv[])
 {
 	SoliApp *app;
-	int status;
+	GOptionContext *context;
+	GError *error = NULL;
+	gint status;
+
+	context = g_option_context_new (NULL);
+	g_option_context_add_group (context, g_irepository_get_option_group ());
+
+	g_option_context_parse (context, &argc, &argv, &error);
+	if (error != NULL)
+	{
+		g_print ("%s: %s\n", PACKAGE, error->message);
+		g_error_free (error);
+		error = NULL;
+	}
+	g_option_context_free (context);
 	
 	app = soli_app_new ();
+
 	status = g_application_run (G_APPLICATION (app), argc, argv);
+
+	g_object_run_dispose (G_OBJECT (app));
+
 	g_object_unref (app);
 
 	return status;
 }
-

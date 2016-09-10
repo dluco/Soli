@@ -28,10 +28,11 @@
 #include "soli-app-activatable.h"
 #include "soli-window.h"
 #include "soli-commands.h"
+#include "soli-plugins-engine.h"
 
 typedef struct
 {
-	PeasEngine *engine;
+	SoliPluginsEngine *engine;
 
 	PeasExtensionSet *extensions;
 } SoliAppPrivate;
@@ -131,9 +132,9 @@ soli_app_startup (GApplication *app)
 
 	g_object_unref (builder);
 
-	priv->engine = peas_engine_get_default ();
+	priv->engine = soli_plugins_engine_get_default ();
 
-	priv->extensions = peas_extension_set_new (priv->engine,
+	priv->extensions = peas_extension_set_new (PEAS_ENGINE (priv->engine),
 											SOLI_TYPE_APP_ACTIVATABLE,
 											"app", SOLI_APP (app),
 											NULL);

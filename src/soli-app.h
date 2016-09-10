@@ -36,7 +36,6 @@ struct _SoliAppClass
 	SoliWindow *(*create_window)	(SoliApp *app);
 };
 
-GType soli_app_get_type (void) G_GNUC_CONST;
 SoliApp *soli_app_new (void);
 
 SoliWindow *soli_app_get_active_window (SoliApp *app);

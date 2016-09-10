@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.gnome.soli" path="/org/gnome/soli/">
+	  <child name="plugins" schema="org.gnome.soli.plugins"/>
+  </schema>
+  <schema id="org.gnome.soli.plugins" path="/org/gnome/soli/plugins">
+    <key name="active-plugins" type="as">
+      <default>true</default>
+      <summary>Active plugins</summary>
+      <description>
+		  List of active plugins.
+      </description>
+    </key>
+  </schema>
+</schemalist>
