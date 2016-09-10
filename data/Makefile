@@ -260,7 +260,8 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-gsettings_SCHEMAS = org.gnome.soli.gschema.xml
+gsettings_SCHEMAS = ca.dluco.soli.gschema.xml
+EXTRA_DIST = $(gsettings_SCHEMAS)
 all: all-am
 
 .SUFFIXES:

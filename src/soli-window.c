@@ -129,7 +129,7 @@ soli_window_class_init (SoliWindowClass *klass)
 	object_class->dispose = soli_window_dispose;
 
 	gtk_widget_class_set_template_from_resource (widget_class,
-	                                             "/org/gnome/soli/soli-window.ui");
+	                                             "/ca/dluco/soli/soli-window.ui");
 
 	gtk_widget_class_bind_template_child_private (widget_class,
 	                                              SoliWindow, notebook);

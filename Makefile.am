@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I build/autotools
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
-SUBDIRS = src 
+SUBDIRS = data src 
 
 dist_doc_DATA = \
 	README \

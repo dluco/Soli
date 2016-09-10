@@ -25,6 +25,7 @@
 #include <girepository.h>
 
 #include "soli-app.h"
+#include "soli-dirs.h"
 
 int
 main (int argc, char *argv[])
@@ -45,6 +46,8 @@ main (int argc, char *argv[])
 		error = NULL;
 	}
 	g_option_context_free (context);
+
+	soli_dirs_init ();
 	
 	app = soli_app_new ();
 

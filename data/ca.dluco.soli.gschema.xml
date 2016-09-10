@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schemalist>
-  <schema id="org.gnome.soli" path="/org/gnome/soli/">
-	  <child name="plugins" schema="org.gnome.soli.plugins"/>
+  <schema id="ca.dluco.soli" path="/ca/dluco/soli/">
+	  <child name="plugins" schema="ca.dluco.soli.plugins"/>
   </schema>
-  <schema id="org.gnome.soli.plugins" path="/org/gnome/soli/plugins">
+  <schema id="ca.dluco.soli.plugins" path="/ca/dluco/soli/plugins/">
     <key name="active-plugins" type="as">
-      <default>true</default>
+      <default>[]</default>
       <summary>Active plugins</summary>
       <description>
 		  List of active plugins.

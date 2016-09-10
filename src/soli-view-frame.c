@@ -66,7 +66,7 @@ soli_view_frame_class_init (SoliViewFrameClass *klass)
 	object_class->finalize = soli_view_frame_finalize;
 	
 	gtk_widget_class_set_template_from_resource (widget_class,
-	                                             "/org/gnome/soli/soli-view-frame.ui");
+	                                             "/ca/dluco/soli/soli-view-frame.ui");
 
 	gtk_widget_class_bind_template_child_private (widget_class, SoliViewFrame, view);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliViewFrame, scrolled_window);

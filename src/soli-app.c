@@ -126,7 +126,7 @@ soli_app_startup (GApplication *app)
 	                                 app_entries, G_N_ELEMENTS (app_entries),
 	                                 app);
 
-	builder = gtk_builder_new_from_resource ("/org/gnome/soli/menu-bar.ui");
+	builder = gtk_builder_new_from_resource ("/ca/dluco/soli/menu-bar.ui");
 	menu_bar = G_MENU_MODEL (gtk_builder_get_object (builder, "menu-bar"));
 	gtk_application_set_menubar (GTK_APPLICATION (app), menu_bar);
 
@@ -229,7 +229,7 @@ SoliApp *
 soli_app_new (void)
 {
 	return g_object_new (soli_app_get_type (),
-	                     "application-id", "org.gnome.soli",
+	                     "application-id", "ca.dluco.soli",
 	                     "flags", G_APPLICATION_HANDLES_OPEN,
 	                     NULL);
 }
