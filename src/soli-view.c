@@ -18,11 +18,16 @@
  */
 
 #include "soli-view.h"
+
+#include <libpeas/peas.h>
+
+#include "soli-view-activatable.h"
 #include "soli-document.h"
+#include "soli-plugins-engine.h"
 
 struct _SoliViewPrivate
 {
-	gchar dummy;
+	PeasExtensionSet *extensions;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (SoliView, soli_view, GTK_SOURCE_TYPE_VIEW);
@@ -34,24 +39,100 @@ soli_view_init (SoliView *view)
 {
 	view->priv = soli_view_get_instance_private (view);
 
-	/* TODO: Add initialization code here */
+	view->priv->extensions = peas_extension_set_new (PEAS_ENGINE (soli_plugins_engine_get_default ()),
+								SOLI_TYPE_VIEW_ACTIVATABLE,
+								"view", view,
+								NULL);
 }
 
 static void
-soli_view_finalize (GObject *object)
+soli_view_dispose (GObject *object)
 {
-	/* TODO: Add deinitalization code here */
+	SoliView *view = SOLI_VIEW (object);
 
-	G_OBJECT_CLASS (soli_view_parent_class)->finalize (object);
+	g_clear_object (&view->priv->extensions);
+
+	G_OBJECT_CLASS (soli_view_parent_class)->dispose (object);
+}
+
+static void
+on_extension_added (PeasExtensionSet *extensions,
+					PeasPluginInfo *info,
+					PeasExtension *extension,
+					SoliView *view)
+{
+	soli_view_activatable_activate (SOLI_VIEW_ACTIVATABLE (extension));
+}
+
+static void
+on_extension_removed (PeasExtensionSet *extensions,
+					PeasPluginInfo *info,
+					PeasExtension *extension,
+					SoliView *view)
+{
+	soli_view_activatable_deactivate (SOLI_VIEW_ACTIVATABLE (extension));
+}
+
+static void
+soli_view_realize (GtkWidget *widget)
+{
+	SoliView *view = SOLI_VIEW (widget);
+
+	GTK_WIDGET_CLASS (soli_view_parent_class)->realize (widget);
+
+	g_signal_connect (view->priv->extensions,
+						"extension-added",
+						G_CALLBACK (on_extension_added),
+						view);
+
+	g_signal_connect (view->priv->extensions,
+						"extension-removed",
+						G_CALLBACK (on_extension_removed),
+						view);
+	/* We only activate the extensions when the view is realized,
+	 * because most plugins will expect this behaviour, and we won't
+	 * change the buffer later anyways.
+	 */
+	peas_extension_set_foreach (view->priv->extensions,
+								(PeasExtensionSetForeachFunc) on_extension_added,
+								view);
+}
+
+static void
+soli_view_unrealize (GtkWidget *widget)
+{
+	SoliView *view = SOLI_VIEW (widget);
+
+	g_signal_handlers_disconnect_by_func (view->priv->extensions,
+										on_extension_added,
+										view);
+
+	g_signal_handlers_disconnect_by_func (view->priv->extensions,
+										on_extension_removed,
+										view);
+
+	/* We need to deactivate the extension on unrealize because it is not
+	 * mandatory that a view has been realized when it is dispose, leading
+	 * to deactivating the plugin without being first activated.
+	 */
+	peas_extension_set_foreach (view->priv->extensions,
+								(PeasExtensionSetForeachFunc) on_extension_removed,
+								view);
+
+	GTK_WIDGET_CLASS (soli_view_parent_class)->unrealize (widget);
 }
 
 static void
 soli_view_class_init (SoliViewClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
+	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 	GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
 
-	object_class->finalize = soli_view_finalize;
+	object_class->dispose = soli_view_dispose;
+
+	widget_class->realize = soli_view_realize;
+	widget_class->unrealize = soli_view_unrealize;
 	
 	text_view_class->create_buffer = soli_view_create_buffer;
 }

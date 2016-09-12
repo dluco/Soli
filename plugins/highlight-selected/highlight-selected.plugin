@@ -1,0 +1,6 @@
+[Plugin]
+Module=highlight-selected
+Loader=python3
+Name=Highlight Selected
+Description=Highlight all occurrences of currently selected text.
+Website=https://gitlab.com/tchaik/gedit-my-plugins/tree/master/plugins/quick_highlight

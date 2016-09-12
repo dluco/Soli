@@ -1,0 +1,4 @@
+[Plugin]
+Module=demo-plugin
+Loader=python3
+Name=Demo Plugin

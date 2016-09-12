@@ -52,7 +52,7 @@ struct _SoliDocumentClass
 	void (* loaded) (SoliDocument *doc);
 };
 
-//GType soli_document_get_type (void) G_GNUC_CONST;
+GType soli_document_get_type (void) G_GNUC_CONST;
 SoliDocument *soli_document_new (void);
 
 GtkSourceFile *soli_document_get_file (SoliDocument *doc);
