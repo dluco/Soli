@@ -1,6 +1,8 @@
-from gi.repository import GObject, GtkSource, Soli
+from gi.repository import GObject, Gtk, GtkSource, PeasGtk, Soli
 
-class HighlightSelected(GObject.Object, Soli.ViewActivatable):
+class HighlightSelectedPlugin(GObject.Object, Soli.ViewActivatable):
+    __gtype_name__ = 'HighlightSelectedPlugin'
+
     view = GObject.property(type=Soli.View)
 
     def __init__(self):
@@ -58,3 +60,9 @@ class HighlightSelected(GObject.Object, Soli.ViewActivatable):
             self.search.set_match_style(style)
             self.settings.set_search_text(None)
             self.search.set_highlight(False)
+
+class HighlightSelectedConfigurable(GObject.Object, PeasGtk.Configurable):
+    __gtype_name__ = 'HighlightSelectedConfigurable'
+
+    def do_create_configure_widget(self):
+        return Gtk.Label.new("Highlight Selected configure widget")
