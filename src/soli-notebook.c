@@ -125,3 +125,21 @@ soli_notebook_close_tab (SoliNotebook *notebook,
 		gtk_notebook_remove_page (GTK_NOTEBOOK (notebook), n);
 	}
 }
+
+void
+soli_notebook_remove_all_tabs (SoliNotebook *notebook)
+{
+	GList *tabs;
+	GList *t;
+
+	g_return_if_fail (SOLI_IS_NOTEBOOK (notebook));
+
+	tabs = gtk_container_get_children (GTK_CONTAINER (notebook));
+	for (t = g_list_last (tabs); t != NULL; t = t->prev)
+	{
+		GtkWidget *tab = t->data;
+		gtk_container_remove (GTK_CONTAINER (notebook), tab);
+	}
+
+	g_list_free (tabs);
+}

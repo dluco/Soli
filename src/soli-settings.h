@@ -29,6 +29,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE(SoliSettings, soli_settings, SOLI, SETTINGS, GObject)
 
+#define SOLI_SETTINGS_SHOW_LINE_NUMBERS "show-line-numbers"
+#define SOLI_SETTINGS_HIGHLIGHT_CURRENT_LINE "highlight-current-line"
+#define SOLI_SETTINGS_WRAP_MODE "wrap-mode"
 #define SOLI_SETTINGS_ACTIVE_PLUGINS "active-plugins"
 
 G_END_DECLS

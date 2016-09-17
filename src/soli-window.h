@@ -58,11 +58,17 @@ soli_window_get_active_tab (SoliWindow *window);
 SoliView *
 soli_window_get_active_view (SoliWindow *window);
 
+GList *
+soli_window_get_unsaved_docs (SoliWindow *window);
+
 void soli_window_open (SoliWindow *win, GFile *file);
 
 void
 soli_window_close_tab (SoliWindow *window,
 						SoliTab *tab);
+
+void
+soli_window_close_all_tabs (SoliWindow *window);
 
 G_END_DECLS
 

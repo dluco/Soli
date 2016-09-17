@@ -23,10 +23,12 @@
 
 #include "soli-view-activatable.h"
 #include "soli-document.h"
+#include "soli-settings.h"
 #include "soli-plugins-engine.h"
 
 struct _SoliViewPrivate
 {
+	GSettings *settings;
 	PeasExtensionSet *extensions;
 };
 
@@ -39,6 +41,8 @@ soli_view_init (SoliView *view)
 {
 	view->priv = soli_view_get_instance_private (view);
 
+	view->priv->settings = g_settings_new ("ca.dluco.soli.preferences");
+
 	view->priv->extensions = peas_extension_set_new (PEAS_ENGINE (soli_plugins_engine_get_default ()),
 								SOLI_TYPE_VIEW_ACTIVATABLE,
 								"view", view,
@@ -50,9 +54,37 @@ soli_view_dispose (GObject *object)
 {
 	SoliView *view = SOLI_VIEW (object);
 
+	g_clear_object (&view->priv->settings);
 	g_clear_object (&view->priv->extensions);
 
 	G_OBJECT_CLASS (soli_view_parent_class)->dispose (object);
+}
+
+static void
+soli_view_constructed (GObject *object)
+{
+	SoliView *view = SOLI_VIEW (object);
+	SoliViewPrivate *priv = view->priv;
+
+	g_settings_bind (priv->settings,
+					 SOLI_SETTINGS_SHOW_LINE_NUMBERS,
+					 view,
+					 "show-line-numbers",
+					 G_SETTINGS_BIND_GET);
+
+	g_settings_bind (priv->settings,
+					 SOLI_SETTINGS_HIGHLIGHT_CURRENT_LINE,
+					 view,
+					 "highlight-current-line",
+					 G_SETTINGS_BIND_GET);
+
+	g_settings_bind (priv->settings,
+					 SOLI_SETTINGS_WRAP_MODE,
+					 view,
+					 "wrap-mode",
+					 G_SETTINGS_BIND_GET);
+
+	G_OBJECT_CLASS (soli_view_parent_class)->constructed (object);
 }
 
 static void
@@ -130,6 +162,7 @@ soli_view_class_init (SoliViewClass *klass)
 	GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
 
 	object_class->dispose = soli_view_dispose;
+	object_class->constructed = soli_view_constructed;
 
 	widget_class->realize = soli_view_realize;
 	widget_class->unrealize = soli_view_unrealize;

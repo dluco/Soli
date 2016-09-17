@@ -97,7 +97,7 @@ soli_plugins_engine_dispose (GObject *object)
 {
 	SoliPluginsEngine *engine = SOLI_PLUGINS_ENGINE (object);
 
-	g_clear_object (&engine);
+	g_clear_object (&engine->plugin_settings);
 
 	G_OBJECT_CLASS (soli_plugins_engine_parent_class)->dispose (object);
 }

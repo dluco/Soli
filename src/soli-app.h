@@ -42,6 +42,9 @@ SoliWindow *soli_app_get_active_window (SoliApp *app);
 
 SoliWindow *soli_app_create_window (SoliApp *app, GdkScreen *screen);
 
+GList *
+soli_app_get_main_windows (SoliApp *app);
+
 /* Callbacks */
 
 G_END_DECLS

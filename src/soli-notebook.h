@@ -62,6 +62,9 @@ void
 soli_notebook_close_tab (SoliNotebook *notebook,
 						SoliTab *tab);
 
+void
+soli_notebook_remove_all_tabs (SoliNotebook *notebook);
+
 G_END_DECLS
 
 #endif /* _SOLI_NOTEBOOK_H_ */

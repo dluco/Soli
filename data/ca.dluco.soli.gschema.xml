@@ -1,15 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schemalist>
-  <schema id="ca.dluco.soli" path="/ca/dluco/soli/">
-	  <child name="plugins" schema="ca.dluco.soli.plugins"/>
-  </schema>
-  <schema id="ca.dluco.soli.plugins" path="/ca/dluco/soli/plugins/">
-    <key name="active-plugins" type="as">
-      <default>[]</default>
-      <summary>Active plugins</summary>
-      <description>
-		  List of active plugins.
-      </description>
-    </key>
-  </schema>
+	<enum id="ca.dluco.soli.WrapMode">
+		<value nick="none" value="0"/>
+		<value nick="char" value="1"/>
+		<value nick="word" value="2"/>
+		<value nick="word-char" value="3"/>
+	</enum>
+
+	<schema id="ca.dluco.soli" path="/ca/dluco/soli/">
+		<child name="preferences" schema="ca.dluco.soli.preferences"/>
+		<child name="plugins" schema="ca.dluco.soli.plugins"/>
+	</schema>
+
+	<schema id="ca.dluco.soli.preferences" path="/ca/dluco/soli/preferences/">
+		<key name="show-line-numbers" type="b">
+			<default>false</default>
+			<summary>Show Line Numbers</summary>
+			<description>
+				Whether a line number should be shown next to each line.
+			</description>
+		</key>
+		<key name="highlight-current-line" type="b">
+			<default>false</default>
+			<summary>Highlight Current Line</summary>
+			<description>
+				Whether the current line should be highlighted.
+			</description>
+		</key>
+		<key name="wrap-mode" enum="ca.dluco.soli.WrapMode">
+			<aliases>
+				<alias value='GTK_WRAP_NONE' target='none'/>
+				<alias value='GTK_WRAP_CHAR' target='char'/>
+				<alias value='GTK_WRAP_WORD' target='word'/>
+			</aliases>
+			<default>'word'</default>
+			<summary>Line Wrapping Mode</summary>
+			<description>
+				Specifies how to wrap long lines.
+			</description>
+		</key>
+	</schema>
+
+	<schema id="ca.dluco.soli.plugins" path="/ca/dluco/soli/plugins/">
+		<key name="active-plugins" type="as">
+			<default>[]</default>
+			<summary>Active plugins</summary>
+			<description>
+				List of active plugins.
+			</description>
+		</key>
+	</schema>
 </schemalist>

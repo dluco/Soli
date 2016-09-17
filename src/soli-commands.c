@@ -31,8 +31,12 @@
 #include "soli-tab.h"
 #include "soli-view.h"
 #include "soli-document.h"
+#include "soli-utils.h"
 
 #define SOLI_TAB_TO_CLOSE "soli-tab-to-close"
+#define SOLI_IS_CLOSING_ALL "soli-is-closing-all"
+#define SOLI_IS_QUITTING "soli-is-quitting"
+#define SOLI_IS_QUITTING_ALL "soli-is-quitting-all"
 
 void
 soli_cmd_open (GSimpleAction *action,
@@ -421,18 +425,113 @@ soli_cmd_close (GSimpleAction *action,
 	soli_cmd_close_tab (active_tab, window);
 }
 
+static void
+quit_if_needed (SoliWindow *window)
+{
+	gboolean is_quitting;
+	gboolean is_quitting_all;
+
+	is_quitting = GPOINTER_TO_BOOLEAN (g_object_get_data (G_OBJECT (window),
+														SOLI_IS_QUITTING));
+
+	is_quitting_all = GPOINTER_TO_BOOLEAN (g_object_get_data (G_OBJECT (window),
+														SOLI_IS_QUITTING_ALL));
+
+	if (is_quitting)
+	{
+		gtk_widget_destroy (GTK_WIDGET (window));
+	}
+
+	if (is_quitting_all)
+	{
+		GtkApplication *app;
+
+		app = GTK_APPLICATION (g_application_get_default ());
+
+		if (gtk_application_get_windows (app) == NULL)
+		{
+			g_application_quit (G_APPLICATION (app));
+		}
+	}
+}
+
+static void
+file_close_all (SoliWindow *window,
+				gboolean is_quitting)
+{
+	GList *unsaved_docs;
+
+	// TODO: check window state
+	
+	g_object_set_data (G_OBJECT (window),
+						SOLI_IS_CLOSING_ALL,
+						GBOOLEAN_TO_POINTER (TRUE));
+
+	g_object_set_data (G_OBJECT (window),
+						SOLI_IS_QUITTING,
+						GBOOLEAN_TO_POINTER (is_quitting));
+
+	unsaved_docs = soli_window_get_unsaved_docs (window);
+
+	if (unsaved_docs != NULL)
+	{
+//		file_close_dialog (window, unsaved_docs);
+
+		g_list_free (unsaved_docs);
+	}
+	else
+	{
+		/* No documents to save, proceed with closing */
+		soli_window_close_all_tabs (window);
+		quit_if_needed (window);
+	}
+}
+
+static void
+quit_all (void)
+{
+	GList *windows, *l;
+	GApplication *app;
+
+	app = g_application_get_default ();
+	windows = soli_app_get_main_windows (SOLI_APP (app));
+
+	if (windows == NULL)
+	{
+		g_application_quit (app);
+		return;
+	}
+
+	for (l = windows; l != NULL; l = l->next)
+	{
+		SoliWindow *window = l->data;
+
+		g_object_set_data (G_OBJECT (window),
+							SOLI_IS_QUITTING_ALL,
+							GBOOLEAN_TO_POINTER (TRUE));
+
+		// TODO: check window state
+
+		file_close_all (window, TRUE);
+	}
+}
+
 void
 soli_cmd_quit (GSimpleAction *action,
                 GVariant      *parameter,
                 gpointer       user_data)
 {
-	GApplication *app;
+	SoliWindow *window = SOLI_WINDOW (user_data);
 
-	g_return_if_fail (G_IS_APPLICATION (user_data));
+	if (window == NULL)
+	{
+		quit_all ();
+		return;
+	}
 
-	app = G_APPLICATION (user_data);
+	// TODO: check window state
 
-	g_application_quit (app);
+	file_close_all (window, TRUE);
 }
 
 void
@@ -531,13 +630,15 @@ soli_cmd_about (GSimpleAction *action,
 	win = gtk_application_get_active_window (GTK_APPLICATION (app));
 	
 	gtk_show_about_dialog (win,
-	                       "program-name",  "Soli",
-	                       "version", VERSION,
-	                       "license-type", GTK_LICENSE_GPL_3_0,
-	                       "authors", authors,
-	                       "comments",
-	                   			"Test GTK+ application",
-	                       "website",
-	                   			"https://github.com/dluco/soli",
-	                       NULL);
+						   "program-name",  PACKAGE_NAME,
+						   "version", VERSION,
+						   "license-type", GTK_LICENSE_GPL_3_0,
+						   "authors", authors,
+						   "comments",
+						   "Test GTK+ application",
+						   "website",
+						   "https://github.com/dluco/soli",
+						   "logo-icon-name",
+						   "text-editor",
+						   NULL);
 }

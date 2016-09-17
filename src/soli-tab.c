@@ -24,8 +24,12 @@
 
 #define SOLI_TAB_KEY "SOLI_TAB_KEY"
 
-struct _SoliTabPrivate
+struct _SoliTab
 {
+	GtkBox parent_instance;
+
+	SoliTabState state;
+
 	SoliViewFrame *frame;
 };
 
@@ -47,21 +51,21 @@ struct _SaverData
 };
 
 
-G_DEFINE_TYPE_WITH_PRIVATE (SoliTab, soli_tab, GTK_TYPE_BOX);
+G_DEFINE_TYPE (SoliTab, soli_tab, GTK_TYPE_BOX);
 
 static void
 soli_tab_init (SoliTab *tab)
 {
 	SoliDocument *doc;
 
-	tab->priv = soli_tab_get_instance_private (tab);
+	tab->state = SOLI_TAB_STATE_NORMAL;
 
-	tab->priv->frame = soli_view_frame_new ();
+	tab->frame = soli_view_frame_new ();
 	
 	gtk_box_pack_end (GTK_BOX (tab),
-						GTK_WIDGET (tab->priv->frame),
+						GTK_WIDGET (tab->frame),
 						TRUE, TRUE, 0);
-	gtk_widget_show (GTK_WIDGET (tab->priv->frame));
+	gtk_widget_show (GTK_WIDGET (tab->frame));
 
 	doc = soli_tab_get_document (tab);
 	g_object_set_data (G_OBJECT (doc), SOLI_TAB_KEY, tab);
@@ -137,6 +141,29 @@ saver_data_free (SaverData *data)
 
 		g_slice_free (SaverData, data);
 	}
+}
+
+SoliTabState
+soli_tab_get_state (SoliTab *tab)
+{
+	g_return_val_if_fail (SOLI_IS_TAB (tab), SOLI_TAB_STATE_NORMAL);
+
+	return tab->state;
+}
+
+void
+soli_tab_set_state (SoliTab *tab,
+					SoliTabState state)
+{
+	g_return_if_fail (SOLI_IS_TAB (tab));
+	g_return_if_fail ((state >= 0) && (state < SOLI_TAB_NUM_STATES));
+
+	if (tab->state == state)
+	{
+		return;
+	}
+
+	tab->state = state;
 }
 
 SoliTab *
@@ -246,6 +273,9 @@ load_async (SoliTab *tab,
 	g_return_if_fail (SOLI_IS_TAB (tab));
 	g_return_if_fail (G_IS_FILE (location));
 	g_return_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable));
+	g_return_if_fail (tab->state == SOLI_TAB_STATE_NORMAL);
+
+	soli_tab_set_state (tab, SOLI_TAB_STATE_LOADING);
 	
 	doc = soli_tab_get_document (tab);
 	file = soli_document_get_file (doc);
@@ -350,6 +380,8 @@ launch_saver (GTask *save_task)
 	SoliDocument *doc = soli_tab_get_document (tab);
 	SaverData *data = g_task_get_task_data (save_task);
 
+	soli_tab_set_state (tab, SOLI_TAB_STATE_SAVING);
+
 	if (data->timer != NULL)
 	{
 		g_timer_destroy (data->timer);
@@ -425,7 +457,7 @@ soli_tab_get_view (SoliTab *tab)
 {
 	g_return_val_if_fail (SOLI_IS_TAB (tab), NULL);
 
-	return soli_view_frame_get_view (tab->priv->frame);
+	return soli_view_frame_get_view (tab->frame);
 }
 
 SoliDocument *
@@ -436,7 +468,7 @@ soli_tab_get_document (SoliTab *tab)
 	
 	g_return_val_if_fail (SOLI_IS_TAB (tab), NULL);
 	
-	view = soli_view_frame_get_view (tab->priv->frame);
+	view = soli_view_frame_get_view (tab->frame);
 	
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 	

@@ -23,11 +23,13 @@
 
 #include "soli-app.h"
 
+#include <gtksourceview/gtksource.h>
 #include <libpeas/peas.h>
 
 #include "soli-app-activatable.h"
 #include "soli-window.h"
 #include "soli-commands.h"
+#include "soli-dirs.h"
 #include "soli-plugins-engine.h"
 
 typedef struct
@@ -45,7 +47,7 @@ soli_app_init (SoliApp *object)
 }
 
 static GActionEntry app_entries[] = {
-	{ "quit", soli_cmd_quit },
+	{ "quit", soli_cmd_quit }, // TODO: add quit_activated (static func)
 	{ "preferences", soli_cmd_preferences },
 	{ "plugins", soli_cmd_plugins },
 	{ "about", soli_cmd_about }
@@ -104,6 +106,9 @@ soli_app_dispose (GObject *object)
 
 	priv = soli_app_get_instance_private (SOLI_APP (object));
 
+	/* Note that unreffing the extensions will automatically remove
+	 * all extensions, which in turn will deactivate the extension.
+	 */
 	g_clear_object (&priv->extensions);
 
 	g_clear_object (&priv->engine);
@@ -117,6 +122,7 @@ soli_app_startup (GApplication *app)
 	SoliAppPrivate *priv;
 	GtkBuilder *builder;
 	GMenuModel *menu_bar;
+	GtkSourceStyleSchemeManager *scheme_manager;
 
 	G_APPLICATION_CLASS (soli_app_parent_class)->startup (app);
 
@@ -131,6 +137,10 @@ soli_app_startup (GApplication *app)
 	gtk_application_set_menubar (GTK_APPLICATION (app), menu_bar);
 
 	g_object_unref (builder);
+
+	scheme_manager = gtk_source_style_scheme_manager_get_default ();
+	gtk_source_style_scheme_manager_append_search_path (scheme_manager,
+														soli_dirs_get_user_styles_dir ());
 
 	priv->engine = soli_plugins_engine_get_default ();
 
@@ -189,7 +199,7 @@ window_delete_event (SoliWindow *window,
 {
 	// TODO: check window state before closing
 
-	soli_cmd_quit (NULL, NULL, app);
+	soli_cmd_quit (NULL, NULL, window);
 
 	/* Do not destroy the window */
 	return TRUE;
@@ -290,4 +300,23 @@ soli_app_create_window (SoliApp *app,
 	// TODO: set window state from settings
 
 	return window;
+}
+
+GList *
+soli_app_get_main_windows (SoliApp *app)
+{
+	GList *res = NULL, *windows, *l;
+
+	g_return_val_if_fail (SOLI_IS_APP (app), NULL);
+
+	windows = gtk_application_get_windows (GTK_APPLICATION (app));
+	for (l = windows; l != NULL; l = l->next)
+	{
+		if (SOLI_IS_WINDOW (l->data))
+		{
+			res = g_list_prepend (res, l->data);
+		}
+	}
+
+	return g_list_reverse (res);
 }
