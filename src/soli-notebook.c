@@ -25,7 +25,6 @@ struct _SoliNotebookPrivate
 	gchar dummy;
 };
 
-
 G_DEFINE_TYPE_WITH_PRIVATE (SoliNotebook, soli_notebook, GTK_TYPE_NOTEBOOK);
 
 static void
