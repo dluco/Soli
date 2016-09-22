@@ -47,6 +47,7 @@ soli_SOURCES = \
 	soli-plugins-engine.c \
 	soli-tag-manager.h \
 	soli-tag-manager.c \
+	soli-utils.h \
 	$(NULL)
 
 nodist_soli_SOURCES = \
