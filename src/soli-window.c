@@ -293,17 +293,6 @@ update_fullscreen (SoliWindow *window,
 					  (GtkCallback)update_view_centering,
 					  GBOOLEAN_TO_POINTER (is_fullscreen));
 
-#ifndef OS_OSX
-	if (is_fullscreen)
-	{
-		gtk_widget_show_all (window->priv->fullscreen_eventbox);
-	}
-	else
-	{
-		gtk_widget_hide (window->priv->fullscreen_eventbox);
-	}
-#endif
-
 	fullscreen_action = g_action_map_lookup_action (G_ACTION_MAP (window),
 	                                                "fullscreen");
 
@@ -476,12 +465,6 @@ soli_window_class_init (SoliWindowClass *klass)
 	/* Bind class to template */
 	gtk_widget_class_set_template_from_resource (widget_class,
 	                                             "/ca/dluco/soli/ui/soli-window.ui");
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, titlebar_paned);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, side_headerbar);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, headerbar);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, new_button);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, open_button);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, gear_button);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, hpaned);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, side_panel_box);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, side_panel);
@@ -494,12 +477,6 @@ soli_window_class_init (SoliWindowClass *klass)
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, language_button);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, tab_width_button);
 	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, line_col_button);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_controls);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_eventbox);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_headerbar);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_new_button);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_open_button);
-	gtk_widget_class_bind_template_child_private (widget_class, SoliWindow, fullscreen_gear_button);
 }
 
 static void
@@ -805,46 +782,6 @@ update_actions_sensitivity (SoliWindow *window)
 }
 
 static void
-on_recent_chooser_item_activated (SoliOpenDocumentSelector *open_document_selector,
-                                  gchar                     *uri,
-                                  SoliWindow               *window)
-{
-	GFile *location;
-	SoliView *active_view;
-
-	g_return_if_fail (SOLI_WINDOW (window));
-	g_return_if_fail (SOLI_OPEN_DOCUMENT_SELECTOR (open_document_selector));
-
-	/* TODO: get_current_file when exists */
-	location = g_file_new_for_uri (uri);
-
-	if (location)
-	{
-		GSList *locations = NULL;
-		GSList *loaded = NULL;
-
-		locations = g_slist_prepend (locations, (gpointer) location);
-		loaded = soli_commands_load_locations (window, locations, NULL, 0, 0);
-
-		/* if it doesn't contain just 1 element */
-		if (!loaded || loaded->next)
-		{
-			soli_recent_remove_if_local (location);
-		}
-
-		g_slist_free (locations);
-		g_slist_free (loaded);
-
-		g_object_unref (location);
-	}
-
-	/* Needed to close the popover when activating the same
-	 * document as the current one */
-	active_view = soli_window_get_active_view (window);
-	gtk_widget_grab_focus (GTK_WIDGET (active_view));
-}
-
-static void
 on_language_selector_shown (SoliHighlightModeSelector *sel,
                             SoliWindow                *window)
 {
@@ -1093,14 +1030,6 @@ set_title (SoliWindow *window)
 		soli_app_set_window_title (SOLI_APP (g_application_get_default ()),
 		                            window,
 		                            "soli");
-		gtk_header_bar_set_title (GTK_HEADER_BAR (window->priv->headerbar),
-		                          "soli");
-		gtk_header_bar_set_subtitle (GTK_HEADER_BAR (window->priv->headerbar),
-		                             NULL);
-		gtk_header_bar_set_title (GTK_HEADER_BAR (window->priv->fullscreen_headerbar),
-		                          "soli");
-		gtk_header_bar_set_subtitle (GTK_HEADER_BAR (window->priv->fullscreen_headerbar),
-		                             NULL);
 		return;
 	}
 
@@ -1196,15 +1125,6 @@ set_title (SoliWindow *window)
 	soli_app_set_window_title (SOLI_APP (g_application_get_default ()),
 				    window,
 				    main_title);
-
-	gtk_header_bar_set_title (GTK_HEADER_BAR (window->priv->headerbar),
-	                          title);
-	gtk_header_bar_set_subtitle (GTK_HEADER_BAR (window->priv->headerbar),
-	                             subtitle);
-	gtk_header_bar_set_title (GTK_HEADER_BAR (window->priv->fullscreen_headerbar),
-	                          title);
-	gtk_header_bar_set_subtitle (GTK_HEADER_BAR (window->priv->fullscreen_headerbar),
-	                             subtitle);
 
 	g_free (dirname);
 	g_free (name);
@@ -1790,87 +1710,6 @@ drop_uris_cb (GtkWidget    *widget,
 	load_uris_from_drop (window, uri_list);
 }
 
-static gboolean
-on_fullscreen_controls_enter_notify_event (GtkWidget        *widget,
-                                           GdkEventCrossing *event,
-                                           SoliWindow      *window)
-{
-	window->priv->in_fullscreen_eventbox = TRUE;
-
-	gtk_revealer_set_reveal_child (GTK_REVEALER (window->priv->fullscreen_controls), TRUE);
-
-	return FALSE;
-}
-
-static gboolean
-real_fullscreen_controls_leave_notify_event (gpointer data)
-{
-	SoliWindow *window = SOLI_WINDOW (data);
-	gboolean hamburger_menu_state;
-	gboolean fullscreen_open_button_state;
-
-	hamburger_menu_state = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (window->priv->fullscreen_gear_button));
-	fullscreen_open_button_state =
-	                  gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (window->priv->fullscreen_open_button));
-
-	window->priv->in_fullscreen_eventbox = FALSE;
-
-	if (!hamburger_menu_state && !fullscreen_open_button_state)
-	{
-		gtk_revealer_set_reveal_child (GTK_REVEALER (window->priv->fullscreen_controls), FALSE);
-	}
-
-	return G_SOURCE_REMOVE;
-}
-
-/* this idle is needed because the toggled signal from gear button is received
- * after the leave event from the event box ( which is automatically triggered when user
- * bring up the gear menu */
-static gboolean
-on_fullscreen_controls_leave_notify_event (GtkWidget        *widget,
-                                           GdkEventCrossing *event,
-                                           SoliWindow      *window)
-{
-	g_idle_add (real_fullscreen_controls_leave_notify_event, window);
-
-	return GDK_EVENT_PROPAGATE;
-}
-
-static void
-fullscreen_controls_setup (SoliWindow *window)
-{
-	SoliWindowPrivate *priv = window->priv;
-
-	g_signal_connect (priv->fullscreen_eventbox,
-	                  "enter-notify-event",
-	                  G_CALLBACK (on_fullscreen_controls_enter_notify_event),
-	                  window);
-
-	g_signal_connect (priv->fullscreen_eventbox,
-	                  "leave-notify-event",
-	                  G_CALLBACK (on_fullscreen_controls_leave_notify_event),
-	                  window);
-
-	gtk_widget_set_size_request (GTK_WIDGET (window->priv->fullscreen_eventbox), -1, 1);
-	gtk_widget_hide (window->priv->fullscreen_eventbox);
-
-	priv->fullscreen_open_document_popover = gtk_popover_new (priv->fullscreen_open_button);
-	gtk_menu_button_set_popover (GTK_MENU_BUTTON (priv->fullscreen_open_button),
-	                             priv->fullscreen_open_document_popover);
-
-	window->priv->fullscreen_open_document_selector = soli_open_document_selector_new (window);
-
-	gtk_container_add (GTK_CONTAINER (priv->fullscreen_open_document_popover),
-	                   GTK_WIDGET (priv->fullscreen_open_document_selector));
-
-	gtk_widget_show_all (GTK_WIDGET (priv->fullscreen_open_document_selector));
-
-	g_signal_connect (window->priv->fullscreen_open_document_selector,
-	                  "file-activated",
-	                  G_CALLBACK (on_recent_chooser_item_activated),
-	                  window);
-}
-
 static void
 empty_search_notify_cb (SoliDocument *doc,
 			GParamSpec    *pspec,
@@ -2242,26 +2081,6 @@ on_notebook_removed (SoliMultiNotebook *mnb,
 }
 
 static void
-on_fullscreen_gear_button_toggled (GtkToggleButton *fullscreen_gear_button,
-                                   SoliWindow     *window)
-{
-	gboolean button_active = gtk_toggle_button_get_active (fullscreen_gear_button);
-
-	gtk_revealer_set_reveal_child (GTK_REVEALER (window->priv->fullscreen_controls),
-				       button_active || window->priv->in_fullscreen_eventbox);
-}
-
-static void
-on_fullscreen_file_menu_button_toggled (GtkMenuButton *fullscreen_open_button,
-                                        SoliWindow   *window)
-{
-	gboolean button_active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (fullscreen_open_button));
-
-	gtk_revealer_set_reveal_child (GTK_REVEALER (window->priv->fullscreen_controls),
-				       button_active || window->priv->in_fullscreen_eventbox);
-}
-
-static void
 side_panel_size_allocate (GtkWidget     *widget,
 			  GtkAllocation *allocation,
 			  SoliWindow   *window)
@@ -2333,7 +2152,7 @@ side_panel_visibility_changed (GtkWidget   *panel,
 {
 	gboolean visible;
 	GAction *action;
-	gchar *layout_desc;
+//	gchar *layout_desc;
 
 	visible = gtk_widget_get_visible (panel);
 
@@ -2355,33 +2174,33 @@ side_panel_visibility_changed (GtkWidget   *panel,
 		gtk_widget_grab_focus (GTK_WIDGET (window->priv->multi_notebook));
 	}
 
-	g_object_get (gtk_settings_get_default (),
-		      "gtk-decoration-layout", &layout_desc,
-		      NULL);
-	if (visible)
-	{
-		gchar **tokens;
-
-		tokens = g_strsplit (layout_desc, ":", 2);
-		if (tokens)
-		{
-			gchar *layout_headerbar;
-
-			layout_headerbar = g_strdup_printf ("%c%s", ':', tokens[1]);
-			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_headerbar);
-			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), tokens[0]);
-
-			g_free (layout_headerbar);
-			g_strfreev (tokens);
-		}
-	}
-	else
-	{
-		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_desc);
-		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), NULL);
-	}
-
-	g_free (layout_desc);
+//	g_object_get (gtk_settings_get_default (),
+//		      "gtk-decoration-layout", &layout_desc,
+//		      NULL);
+//	if (visible)
+//	{
+//		gchar **tokens;
+//
+//		tokens = g_strsplit (layout_desc, ":", 2);
+//		if (tokens)
+//		{
+//			gchar *layout_headerbar;
+//
+//			layout_headerbar = g_strdup_printf ("%c%s", ':', tokens[1]);
+//			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_headerbar);
+//			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), tokens[0]);
+//
+//			g_free (layout_headerbar);
+//			g_strfreev (tokens);
+//		}
+//	}
+//	else
+//	{
+//		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_desc);
+//		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), NULL);
+//	}
+//
+//	g_free (layout_desc);
 }
 
 static void
@@ -2397,10 +2216,6 @@ on_side_panel_stack_children_number_changed (GtkStack    *stack,
 	if (children != NULL && children->next != NULL)
 	{
 		gtk_widget_show (priv->side_stack_switcher);
-
-#ifndef OS_OSX
-		gtk_header_bar_set_custom_title (GTK_HEADER_BAR (priv->side_headerbar), priv->side_stack_switcher);
-#endif
 	}
 	else
 	{
@@ -2410,10 +2225,6 @@ on_side_panel_stack_children_number_changed (GtkStack    *stack,
 		{
 			gtk_widget_hide (priv->side_stack_switcher);
 		}
-
-#ifndef OS_OSX
-		gtk_header_bar_set_custom_title (GTK_HEADER_BAR (priv->side_headerbar), NULL);
-#endif
 	}
 
 	g_list_free (children);
@@ -2656,17 +2467,17 @@ window_unrealized (GtkWidget *window,
 					      window);
 }
 
-static void
-check_window_is_active (SoliWindow *window,
-			GParamSpec *property,
-			gpointer useless)
-{
-	if (window->priv->window_state & GDK_WINDOW_STATE_FULLSCREEN)
-	{
-		gtk_widget_set_visible (window->priv->fullscreen_eventbox,
-					gtk_window_is_active (GTK_WINDOW (window)));
-	}
-}
+//static void
+//check_window_is_active (SoliWindow *window,
+//			GParamSpec *property,
+//			gpointer useless)
+//{
+//	if (window->priv->window_state & GDK_WINDOW_STATE_FULLSCREEN)
+//	{
+//		gtk_widget_set_visible (window->priv->fullscreen_eventbox,
+//					gtk_window_is_active (GTK_WINDOW (window)));
+//	}
+//}
 
 static void
 extension_added (PeasExtensionSet *extensions,
@@ -2725,19 +2536,19 @@ static GActionEntry win_entries[] = {
 	{ "overwrite-mode", NULL, NULL, "false", _soli_cmd_edit_overwrite_mode }
 };
 
-static void
-sync_fullscreen_actions (SoliWindow *window,
-			 gboolean     fullscreen)
-{
-	GtkMenuButton *button;
-	GPropertyAction *action;
-
-	button = fullscreen ? window->priv->fullscreen_gear_button : window->priv->gear_button;
-	g_action_map_remove_action (G_ACTION_MAP (window), "hamburger-menu");
-	action = g_property_action_new ("hamburger-menu", button, "active");
-	g_action_map_add_action (G_ACTION_MAP (window), G_ACTION (action));
-	g_object_unref (action);
-}
+//static void
+//sync_fullscreen_actions (SoliWindow *window,
+//			 gboolean     fullscreen)
+//{
+//	GtkMenuButton *button;
+//	GPropertyAction *action;
+//
+//	button = fullscreen ? window->priv->fullscreen_gear_button : window->priv->gear_button;
+//	g_action_map_remove_action (G_ACTION_MAP (window), "hamburger-menu");
+//	action = g_property_action_new ("hamburger-menu", button, "active");
+//	g_action_map_add_action (G_ACTION_MAP (window), G_ACTION (action));
+//	g_object_unref (action);
+//}
 
 static void
 soli_window_init (SoliWindow *window)
@@ -2753,7 +2564,6 @@ soli_window_init (SoliWindow *window)
 	window->priv->state = SOLI_WINDOW_STATE_NORMAL;
 	window->priv->inhibition_cookie = 0;
 	window->priv->dispose_has_run = FALSE;
-	window->priv->fullscreen_controls = NULL;
 	window->priv->direct_save_uri = NULL;
 	window->priv->closed_docs_stack = NULL;
 	window->priv->editor_settings = g_settings_new ("ca.dluco.soli.preferences.editor");
@@ -2776,55 +2586,8 @@ soli_window_init (SoliWindow *window)
 	window->priv->window_group = gtk_window_group_new ();
 	gtk_window_group_add_window (window->priv->window_group, GTK_WINDOW (window));
 
-	/* Setup file popover and file dialog */
-	window->priv->open_document_popover = gtk_popover_new (window->priv->open_button);
-	gtk_menu_button_set_popover (GTK_MENU_BUTTON (window->priv->open_button),
-	                             window->priv->open_document_popover);
-
-	window->priv->open_document_selector = soli_open_document_selector_new (window);
-
-	gtk_container_add (GTK_CONTAINER (window->priv->open_document_popover),
-	                   GTK_WIDGET (window->priv->open_document_selector));
-
-	gtk_widget_show_all (GTK_WIDGET (window->priv->open_document_selector));
-
-	g_signal_connect (window->priv->open_document_selector,
-	                  "file-activated",
-	                  G_CALLBACK (on_recent_chooser_item_activated),
-	                  window);
-
-	fullscreen_controls_setup (window);
-	sync_fullscreen_actions (window, FALSE);
-
-	g_object_bind_property (soli_open_document_selector_get_search_entry (window->priv->open_document_selector),
-	                        "text",
-	                        soli_open_document_selector_get_search_entry (window->priv->fullscreen_open_document_selector),
-	                        "text",
-	                        G_BINDING_BIDIRECTIONAL | G_BINDING_SYNC_CREATE);
-
-	hamburger_menu = _soli_app_get_hamburger_menu (SOLI_APP (g_application_get_default ()));
-	if (hamburger_menu)
-	{
-		gtk_menu_button_set_menu_model (window->priv->gear_button, hamburger_menu);
-		gtk_menu_button_set_menu_model (window->priv->fullscreen_gear_button, hamburger_menu);
-	}
-	else
-	{
-		gtk_widget_hide (GTK_WIDGET (window->priv->gear_button));
-		gtk_widget_hide (GTK_WIDGET (window->priv->fullscreen_gear_button));
-		gtk_widget_set_no_show_all (GTK_WIDGET (window->priv->gear_button), TRUE);
-		gtk_widget_set_no_show_all (GTK_WIDGET (window->priv->fullscreen_gear_button), TRUE);
-	}
-
-	g_signal_connect (GTK_TOGGLE_BUTTON (window->priv->fullscreen_open_button),
-	                  "toggled",
-	                  G_CALLBACK (on_fullscreen_file_menu_button_toggled),
-	                  window);
-
-	g_signal_connect (GTK_TOGGLE_BUTTON (window->priv->fullscreen_gear_button),
-	                  "toggled",
-	                  G_CALLBACK (on_fullscreen_gear_button_toggled),
-	                  window);
+//	fullscreen_controls_setup (window);
+//	sync_fullscreen_actions (window, FALSE);
 
 	/* Setup status bar */
 	setup_statusbar (window);
@@ -2938,10 +2701,10 @@ soli_window_init (SoliWindow *window)
 			  NULL);
 
 	/* Check if the window is active for fullscreen */
-	g_signal_connect (window,
-			  "notify::is-active",
-			  G_CALLBACK (check_window_is_active),
-			  NULL);
+//	g_signal_connect (window,
+//			  "notify::is-active",
+//			  G_CALLBACK (check_window_is_active),
+//			  NULL);
 
 	soli_debug_message (DEBUG_WINDOW, "Update plugins ui");
 
@@ -3556,7 +3319,7 @@ _soli_window_fullscreen (SoliWindow *window)
 	if (_soli_window_is_fullscreen (window))
 		return;
 
-	sync_fullscreen_actions (window, TRUE);
+//	sync_fullscreen_actions (window, TRUE);
 
 	/* Go to fullscreen mode and hide bars */
 	gtk_window_fullscreen (GTK_WINDOW (&window->window));
@@ -3570,7 +3333,7 @@ _soli_window_unfullscreen (SoliWindow *window)
 	if (!_soli_window_is_fullscreen (window))
 		return;
 
-	sync_fullscreen_actions (window, FALSE);
+//	sync_fullscreen_actions (window, FALSE);
 
 	/* Unfullscreen and show bars */
 	gtk_window_unfullscreen (GTK_WINDOW (&window->window));

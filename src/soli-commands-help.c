@@ -104,22 +104,14 @@ _soli_cmd_help_about (SoliWindow *window)
 		NULL
 	};
 
-	static const gchar copyright[] = "Copyright \xc2\xa9 1998-2016 - the soli team";
+	static const gchar copyright[] = "Copyright \xc2\xa9 1998-2016 - the gedit team";
 
 	static const gchar comments[] = \
-		N_("soli is a small and lightweight text editor for the GNOME Desktop");
+		N_("soli is a fork of gedit, a small and lightweight text editor for the GNOME Desktop");
 
-	GdkPixbuf *logo;
 	GError *error = NULL;
 
 	soli_debug (DEBUG_COMMANDS);
-
-	logo = gdk_pixbuf_new_from_resource ("/ca/dluco/soli/pixmaps/soli-logo.png", &error);
-	if (error != NULL)
-	{
-		g_warning ("Error when loading the soli logo: %s", error->message);
-		g_clear_error (&error);
-	}
 
 	gtk_show_about_dialog (GTK_WINDOW (window),
 			       "program-name", "soli",
@@ -128,14 +120,12 @@ _soli_cmd_help_about (SoliWindow *window)
 			       "copyright", copyright,
 			       "license-type", GTK_LICENSE_GPL_2_0,
 			       "documenters", documenters,
-			       "logo", logo,
+			       "logo-icon-name", "text-editor",
 			       "translator-credits", _("translator-credits"),
 			       "version", VERSION,
-			       "website", "http://www.soli.org",
-			       "website-label", "www.soli.org",
+			       "website", "http://www.github.com/dluco/Soli",
+			       "website-label", "www.github.com/dluco/Soli",
 			       NULL);
-
-	g_clear_object (&logo);
 }
 
 /* ex:set ts=8 noet: */

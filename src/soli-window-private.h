@@ -27,7 +27,6 @@
 #include "soli-message-bus.h"
 #include "soli-settings.h"
 #include "soli-multi-notebook.h"
-#include "soli-open-document-selector.h"
 
 G_BEGIN_DECLS
 
@@ -54,17 +53,6 @@ struct _SoliWindowPrivate
 	SoliMessageBus *message_bus;
 	PeasExtensionSet *extensions;
 
-	/* Widgets for fullscreen mode */
-	GtkWidget      *fullscreen_controls;
-	GtkWidget      *fullscreen_eventbox;
-	GtkWidget      *fullscreen_headerbar;
-	GtkMenuButton  *fullscreen_gear_button;
-
-	GtkWidget       *fullscreen_new_button;
-	GtkWidget       *fullscreen_open_button;
-	GtkWidget       *fullscreen_open_document_popover;
-	SoliOpenDocumentSelector *fullscreen_open_document_selector;
-
 	/* statusbar and context ids for statusbar messages */
 	GtkWidget      *statusbar;
 	GtkWidget      *line_col_button;
@@ -78,18 +66,6 @@ struct _SoliWindowPrivate
 	guint 	        tab_width_id;
 	guint 	        language_changed_id;
 	guint           wrap_mode_changed_id;
-
-	/* Headerbars */
-	GtkWidget      *titlebar_paned;
-	GtkWidget      *side_headerbar;
-	GtkWidget      *headerbar;
-
-	GtkWidget       *open_document_popover;
-	GtkWidget       *new_button;
-	GtkWidget       *open_button;
-	SoliOpenDocumentSelector *open_document_selector;
-
-	GtkMenuButton  *gear_button;
 
 	gint            num_tabs_with_error;
 
@@ -116,8 +92,6 @@ struct _SoliWindowPrivate
 
 	guint           removing_tabs : 1;
 	guint           dispose_has_run : 1;
-
-	guint           in_fullscreen_eventbox : 1;
 };
 
 G_END_DECLS
