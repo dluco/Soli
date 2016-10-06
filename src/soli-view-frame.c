@@ -68,7 +68,6 @@ struct _SoliViewFrame
 	GtkTextMark *start_mark;
 
 	GtkRevealer *revealer;
-//	GdTaggedEntry *search_entry;
 	GtkWidget *search_entry;
 //	GdTaggedEntryTag *entry_tag;
 	GtkWidget *entry_tag;

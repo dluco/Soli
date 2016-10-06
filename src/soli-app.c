@@ -71,7 +71,7 @@ typedef struct
 	GtkPrintSettings  *print_settings;
 
 	SoliSettings     *settings;
-	GSettings         *ui_settings;
+	GSettings         *editor_settings;
 	GSettings         *window_settings;
 
 	GMenuModel        *hamburger_menu;
@@ -178,7 +178,7 @@ soli_app_dispose (GObject *object)
 
 	priv = soli_app_get_instance_private (SOLI_APP (object));
 
-	g_clear_object (&priv->ui_settings);
+	g_clear_object (&priv->editor_settings);
 	g_clear_object (&priv->window_settings);
 	g_clear_object (&priv->settings);
 
@@ -765,6 +765,10 @@ show_menubar (void)
 	              "gtk-shell-shows-menubar", &result,
 	              NULL);
 
+	result = TRUE;
+
+	g_print ("Show menubar: %s\n", (result) ? "true" : "false");
+
 	return result;
 }
 
@@ -798,7 +802,7 @@ soli_app_startup (GApplication *application)
 
 	/* Load settings */
 	priv->settings = soli_settings_new ();
-	priv->ui_settings = g_settings_new ("ca.dluco.soli.preferences.editor");
+	priv->editor_settings = g_settings_new ("ca.dluco.soli.preferences.editor");
 	priv->window_settings = g_settings_new ("ca.dluco.soli.state.window");
 
 	/* initial lockdown state */

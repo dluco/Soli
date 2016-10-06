@@ -61,9 +61,10 @@
                   <class name="linked"/>
                 </style>
                 <child>
-                  <object class="GdTaggedEntry" id="search_entry">
+                  <object class="GtkSearchEntry" id="search_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+					<!-- Ensure search icon is clickable -->
                     <property name="primary-icon-activatable">True</property>
                     <property name="primary-icon-sensitive">True</property>
                   </object>

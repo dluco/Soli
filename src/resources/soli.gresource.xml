@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
 	<gresource prefix="/ca/dluco/soli">
-		<file preprocess="xml-stripblanks">gtk/menu-bar.ui</file>
+		<file preprocess="xml-stripblanks">gtk/menus.ui</file>
+		<file preprocess="xml-stripblanks">gtk/menus-common.ui</file>
 
 		<file preprocess="xml-stripblanks">ui/soli-encodings-dialog.ui</file>
 		<file preprocess="xml-stripblanks">ui/soli-highlight-mode-dialog.ui</file>
