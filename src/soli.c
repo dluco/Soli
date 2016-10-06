@@ -24,7 +24,7 @@
 #include <gtk/gtk.h>
 #include <girepository.h>
 
-#include "soli-app.h"
+#include "soli-app-x11.h"
 #include "soli-dirs.h"
 
 int
@@ -49,7 +49,10 @@ main (int argc, char *argv[])
 
 	soli_dirs_init ();
 	
-	app = soli_app_new ();
+	app = g_object_new (SOLI_TYPE_APP_X11,
+						"application-id", "ca.dluco.soli",
+						"flags", G_APPLICATION_HANDLES_COMMAND_LINE | G_APPLICATION_HANDLES_OPEN,
+						NULL);
 
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 

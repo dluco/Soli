@@ -1,24 +1,25 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
  * soli-window-activatable.h
- * Copyright (C) 2016 David Luco <dluco11@gmail.com>
+ * This file is part of soli
  *
- * soli is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * soli is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - Steve Frécinaux
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Library General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Library General Public License
+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOLI_WINDOW_ACTIVATABLE_
-#define _SOLI_WINDOW_ACTIVATABLE_
+#ifndef SOLI_WINDOW_ACTIVATABLE_H
+#define SOLI_WINDOW_ACTIVATABLE_H
 
 #include <glib-object.h>
 
@@ -31,20 +32,18 @@ G_DECLARE_INTERFACE (SoliWindowActivatable, soli_window_activatable, SOLI, WINDO
 struct _SoliWindowActivatableInterface
 {
 	GTypeInterface g_iface;
-	
+
 	/* Virtual public methods */
-	void (*activate) (SoliWindowActivatable *activatable);
-	void (*deactivate) (SoliWindowActivatable *activatable);
-	void (*update_state) (SoliWindowActivatable *activatable);
+	void	(*activate)		(SoliWindowActivatable *activatable);
+	void	(*deactivate)		(SoliWindowActivatable *activatable);
+	void	(*update_state)		(SoliWindowActivatable *activatable);
 };
 
-void soli_window_activatable_activate (SoliWindowActivatable *activatable);
-
-void soli_window_activatable_deactivate (SoliWindowActivatable *activatable);
-
-void soli_window_activatable_update_state (SoliWindowActivatable *activatable);
+void	 soli_window_activatable_activate	(SoliWindowActivatable *activatable);
+void	 soli_window_activatable_deactivate	(SoliWindowActivatable *activatable);
+void	 soli_window_activatable_update_state	(SoliWindowActivatable *activatable);
 
 G_END_DECLS
 
-#endif /* _SOLI_WINDOW_ACTIVATABLE_ */
-
+#endif /* SOLI_WINDOW_ACTIVATABLE_H */
+/* ex:set ts=8 noet: */

@@ -1,31 +1,32 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
  * soli-app.h
- * Copyright (C) 2016 David Luco <dluco11@gmail.com>
- * 
- * Soli is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This file is part of soli
+ *
+ * Copyright (C) 2005 - Paolo Maggi
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
- * Soli is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOLI_APP_
-#define _SOLI_APP_
+#ifndef SOLI_APP_H
+#define SOLI_APP_H
 
 #include <gtk/gtk.h>
 #include "soli-window.h"
 
 G_BEGIN_DECLS
 
-#define SOLI_TYPE_APP             (soli_app_get_type ())
+#define SOLI_TYPE_APP (soli_app_get_type())
 
 G_DECLARE_DERIVABLE_TYPE (SoliApp, soli_app, SOLI, APP, GtkApplication)
 
@@ -33,21 +34,63 @@ struct _SoliAppClass
 {
 	GtkApplicationClass parent_class;
 
-	SoliWindow *(*create_window)	(SoliApp *app);
+	gboolean (*show_help)                   (SoliApp    *app,
+	                                         GtkWindow   *parent,
+	                                         const gchar *name,
+	                                         const gchar *link_id);
+
+	gchar *(*help_link_id)                  (SoliApp    *app,
+	                                         const gchar *name,
+	                                         const gchar *link_id);
+
+	void (*set_window_title)                (SoliApp    *app,
+	                                         SoliWindow *window,
+	                                         const gchar *title);
+
+	SoliWindow *(*create_window)           (SoliApp    *app);
+
+	gboolean (*process_window_event)        (SoliApp    *app,
+	                                         SoliWindow *window,
+	                                         GdkEvent    *event);
 };
 
-SoliApp *soli_app_new (void);
+typedef enum
+{
+	SOLI_LOCKDOWN_COMMAND_LINE	= 1 << 0,
+	SOLI_LOCKDOWN_PRINTING		= 1 << 1,
+	SOLI_LOCKDOWN_PRINT_SETUP	= 1 << 2,
+	SOLI_LOCKDOWN_SAVE_TO_DISK	= 1 << 3
+} SoliLockdownMask;
 
-SoliWindow *soli_app_get_active_window (SoliApp *app);
+/* We need to define this here to avoid problems with bindings and gsettings */
+#define SOLI_LOCKDOWN_ALL 0xF
 
-SoliWindow *soli_app_create_window (SoliApp *app, GdkScreen *screen);
+SoliWindow	*soli_app_create_window		(SoliApp    *app,
+							 GdkScreen   *screen);
 
-GList *
-soli_app_get_main_windows (SoliApp *app);
+GList		*soli_app_get_main_windows		(SoliApp    *app);
 
-/* Callbacks */
+GList		*soli_app_get_documents		(SoliApp    *app);
+
+GList		*soli_app_get_views			(SoliApp    *app);
+
+/* Lockdown state */
+SoliLockdownMask soli_app_get_lockdown		(SoliApp    *app);
+
+gboolean	 soli_app_show_help			(SoliApp    *app,
+                                                         GtkWindow   *parent,
+                                                         const gchar *name,
+                                                         const gchar *link_id);
+
+void		 soli_app_set_window_title		(SoliApp    *app,
+                                                         SoliWindow *window,
+                                                         const gchar *title);
+gboolean	soli_app_process_window_event		(SoliApp    *app,
+							 SoliWindow *window,
+							 GdkEvent    *event);
 
 G_END_DECLS
 
-#endif /* _SOLI_APP_ */
+#endif /* SOLI_APP_H */
 
+/* ex:set ts=8 noet: */

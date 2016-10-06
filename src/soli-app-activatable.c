@@ -1,40 +1,68 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * soli-app-activatable.c
- * Copyright (C) 2016 David Luco <dluco11@gmail.com>
- * 
- * Soli is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Soli is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
-, * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * soli-app-activatable.h
+ * This file is part of soli
+ *
+ * Copyright (C) 2010 Steve Frécinaux
+ * Copyright (C) 2010 Jesse van den Kieboom
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Library General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Library General Public License
+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "soli-app-activatable.h"
 #include "soli-app.h"
+#include "soli-app-private.h"
+
+/**
+ * SECTION:soli-app-activatable
+ * @short_description: Interface for activatable extensions on apps
+ * @see_also: #PeasExtensionSet
+ *
+ * #SoliAppActivatable is an interface which should be implemented by
+ * extensions that should be activated on a soli application.
+ **/
 
 G_DEFINE_INTERFACE(SoliAppActivatable, soli_app_activatable, G_TYPE_OBJECT)
 
 static void
 soli_app_activatable_default_init (SoliAppActivatableInterface *iface)
 {
+	/**
+	 * SoliAppActivatable:app:
+	 *
+	 * The app property contains the soli app for this
+	 * #SoliAppActivatable instance.
+	 */
 	g_object_interface_install_property (iface,
-										g_param_spec_object ("app",
-															"App",
-															"The soli app",
-															SOLI_TYPE_APP,
-															G_PARAM_READWRITE |
-															G_PARAM_CONSTRUCT_ONLY |
-															G_PARAM_STATIC_STRINGS));
+	                                     g_param_spec_object ("app",
+	                                                          "App",
+	                                                          "The soli app",
+	                                                          SOLI_TYPE_APP,
+	                                                          G_PARAM_READWRITE |
+	                                                          G_PARAM_CONSTRUCT_ONLY |
+	                                                          G_PARAM_STATIC_STRINGS));
 }
 
+/**
+ * soli_app_activatable_activate:
+ * @activatable: A #SoliAppActivatable.
+ *
+ * Activates the extension on the application.
+ */
 void
 soli_app_activatable_activate (SoliAppActivatable *activatable)
 {
@@ -50,6 +78,13 @@ soli_app_activatable_activate (SoliAppActivatable *activatable)
 	}
 }
 
+/**
+ * soli_app_activatable_deactivate:
+ * @activatable: A #SoliAppActivatable.
+ *
+ * Deactivates the extension from the application.
+ *
+ */
 void
 soli_app_activatable_deactivate (SoliAppActivatable *activatable)
 {
@@ -64,3 +99,21 @@ soli_app_activatable_deactivate (SoliAppActivatable *activatable)
 		iface->deactivate (activatable);
 	}
 }
+
+SoliMenuExtension *
+soli_app_activatable_extend_menu (SoliAppActivatable *activatable,
+				   const gchar *extension_point)
+{
+	SoliApp *app;
+	SoliMenuExtension *ext;
+
+	g_return_val_if_fail (SOLI_IS_APP_ACTIVATABLE (activatable), NULL);
+
+	g_object_get (G_OBJECT (activatable), "app", &app, NULL);
+	ext = _soli_app_extend_menu (app, extension_point);
+	g_object_unref (app);
+
+	return ext;
+}
+
+/* ex:set ts=8 noet: */

@@ -27,8 +27,8 @@ PKG_PROG_PKG_CONFIG
 # Checks for typedefs, structures, and compiler characteristics
 AC_PROG_CC_STDC
 
-AC_SUBST(SOLI_CFLAGS)
-AC_SUBST(SOLI_LIBS)
+AC_CHECK_LIBM
+AC_SUBST(LIBM)
 
 # Checks for library dependencies
 PKG_CHECK_MODULES([SOLI], [
@@ -41,7 +41,8 @@ PKG_CHECK_MODULES([SOLI], [
 	libpeas-gtk-1.0 >= 1.0.0
 ])
 
-#	gobject-introspection-1.0
+SOLI_CFLAGS="$SOLI_CFLAGS"
+SOLI_LIBS="$SOLI_LIBS $LIBM"
 
 AC_SUBST(SOLI_CFLAGS)
 AC_SUBST(SOLI_LIBS)
@@ -67,6 +68,7 @@ GOBJECT_INTROSPECTION_CHECK([1.38.0])
 GLIB_GSETTINGS
 
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
+AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
 
 AM_PATH_PYTHON
 

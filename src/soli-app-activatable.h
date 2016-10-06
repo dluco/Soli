@@ -1,26 +1,29 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
  * soli-app-activatable.h
- * Copyright (C) 2016 David Luco <dluco11@gmail.com>
- * 
- * Soli is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Soli is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of soli
+ *
+ * Copyright (C) 2010 - Steve Frécinaux
+ * Copyright (C) 2010 - Jesse van den Kieboom
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Library General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Library General Public License
+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SOLI_APP_ACTIVATABLE_
-#define _SOLI_APP_ACTIVATABLE_
+#ifndef SOLI_APP_ACTIVATABLE_H
+#define SOLI_APP_ACTIVATABLE_H
 
 #include <glib-object.h>
+#include "soli-menu-extension.h"
 
 G_BEGIN_DECLS
 
@@ -33,13 +36,29 @@ struct _SoliAppActivatableInterface
 	GTypeInterface g_iface;
 
 	/* Virtual public methods */
-	void (*activate) (SoliAppActivatable *activatable);
-	void (*deactivate) (SoliAppActivatable *activatable);
+	void	(*activate)		(SoliAppActivatable *activatable);
+	void	(*deactivate)		(SoliAppActivatable *activatable);
 };
 
-void soli_app_activatable_activate (SoliAppActivatable *activatable);
-void soli_app_activatable_deactivate (SoliAppActivatable *activatable);
+void	 soli_app_activatable_activate			(SoliAppActivatable *activatable);
+void	 soli_app_activatable_deactivate		(SoliAppActivatable *activatable);
+
+/**
+ * soli_app_activatable_extend_menu:
+ * @activatable: A #SoliAppActivatable.
+ * @extension_point: the extension point section of the menu to get.
+ *
+ * Gets the #SoliMenuExtension for the menu @extension_point. Note that
+ * the extension point could be in different menus (gear menu, app menu, etc)
+ * depending on the platform.
+ *
+ * Returns: (transfer full): a #SoliMenuExtension for the specific section
+ * or %NULL if not found.
+ */
+SoliMenuExtension	*soli_app_activatable_extend_menu	(SoliAppActivatable *activatable,
+								 const gchar *extension_point);
 
 G_END_DECLS
 
-#endif /* _SOLI_APP_ACTIVATABLE_ */
+#endif /* SOLI_APP_ACTIVATABLE_H */
+/* ex:set ts=8 noet: */

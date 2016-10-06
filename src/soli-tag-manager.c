@@ -1,7 +1,5 @@
 #include "soli-tag-manager.h"
 
-#include <glib.h>
-
 struct _SoliTagManager
 {
 	GObject parent_instance;

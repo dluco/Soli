@@ -1,0 +1,42 @@
+.soli-side-panel-paned.pane-separator:dir(ltr),
+.soli-side-panel-paned.pane-separator:hover:dir(ltr) {
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+}
+
+.soli-side-panel-paned.pane-separator:dir(rtl),
+.soli-side-panel-paned.pane-separator:hover:dir(rtl) {
+    border-radius: 0;
+    border-width: 0 0 0 1px;
+}
+
+.soli-menu-stack-switcher {
+    padding: 12px;
+}
+
+.soli-map-frame:dir(ltr) {
+    border-width: 0 0 0 1px;
+}
+
+.soli-map-frame:dir(rtl) {
+    border-width: 0 1px 0 0;
+}
+
+.open-document-selector-treeview {
+    padding: 3px 6px 3px 6px;
+}
+
+statusbar frame {
+    border: none;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+statusbar button.flat {
+    border-radius: 0;
+    border-bottom: none;
+}
+
+SoliFileBrowserWidget .small-button {
+  padding: 2px 4px;
+}
