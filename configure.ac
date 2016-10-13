@@ -72,13 +72,22 @@ AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
 
 AM_PATH_PYTHON
 
+PLUGINS_LIB_DIR="$libdir/soli/plugins"
+AC_SUBST(PLUGINS_LIB_DIR)
+
+PLUGINS_DATA_DIR="$datadir/soli/plugins"
+AC_SUBST(PLUGINS_DATA_DIR)
+
 # Output
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	data/Makefile
 	plugins/Makefile
+	plugins/codecomment/Makefile
+	plugins/quickopen/Makefile
 	plugins/highlight-selected/Makefile
+	plugins/modelines/Makefile
 ])
 
 AC_OUTPUT

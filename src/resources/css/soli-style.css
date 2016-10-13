@@ -26,6 +26,15 @@
     padding: 3px 6px 3px 6px;
 }
 
+.soli-search-slider {
+    background-color: @theme_base_color;
+    padding: 6px;
+    border-color: @borders;
+    border-radius: 0 0 3px 3px;
+    border-width: 0 1px 1px 1px;
+    border-style: solid;
+}
+
 statusbar frame {
     border: none;
     padding-left: 6px;

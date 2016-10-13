@@ -2152,7 +2152,6 @@ side_panel_visibility_changed (GtkWidget   *panel,
 {
 	gboolean visible;
 	GAction *action;
-//	gchar *layout_desc;
 
 	visible = gtk_widget_get_visible (panel);
 
@@ -2164,7 +2163,7 @@ side_panel_visibility_changed (GtkWidget   *panel,
 	action = g_action_map_lookup_action (G_ACTION_MAP (window), "side-panel");
 	g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (visible));
 
-	/* focus the right widget and set the right styles */
+	/* focus the right widget */
 	if (visible)
 	{
 		gtk_widget_grab_focus (window->priv->side_panel);
@@ -2173,34 +2172,6 @@ side_panel_visibility_changed (GtkWidget   *panel,
 	{
 		gtk_widget_grab_focus (GTK_WIDGET (window->priv->multi_notebook));
 	}
-
-//	g_object_get (gtk_settings_get_default (),
-//		      "gtk-decoration-layout", &layout_desc,
-//		      NULL);
-//	if (visible)
-//	{
-//		gchar **tokens;
-//
-//		tokens = g_strsplit (layout_desc, ":", 2);
-//		if (tokens)
-//		{
-//			gchar *layout_headerbar;
-//
-//			layout_headerbar = g_strdup_printf ("%c%s", ':', tokens[1]);
-//			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_headerbar);
-//			gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), tokens[0]);
-//
-//			g_free (layout_headerbar);
-//			g_strfreev (tokens);
-//		}
-//	}
-//	else
-//	{
-//		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->headerbar), layout_desc);
-//		gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (window->priv->side_headerbar), NULL);
-//	}
-//
-//	g_free (layout_desc);
 }
 
 static void
@@ -2467,18 +2438,6 @@ window_unrealized (GtkWidget *window,
 					      window);
 }
 
-//static void
-//check_window_is_active (SoliWindow *window,
-//			GParamSpec *property,
-//			gpointer useless)
-//{
-//	if (window->priv->window_state & GDK_WINDOW_STATE_FULLSCREEN)
-//	{
-//		gtk_widget_set_visible (window->priv->fullscreen_eventbox,
-//					gtk_window_is_active (GTK_WINDOW (window)));
-//	}
-//}
-
 static void
 extension_added (PeasExtensionSet *extensions,
 		 PeasPluginInfo   *info,
@@ -2536,20 +2495,6 @@ static GActionEntry win_entries[] = {
 	{ "overwrite-mode", NULL, NULL, "false", _soli_cmd_edit_overwrite_mode }
 };
 
-//static void
-//sync_fullscreen_actions (SoliWindow *window,
-//			 gboolean     fullscreen)
-//{
-//	GtkMenuButton *button;
-//	GPropertyAction *action;
-//
-//	button = fullscreen ? window->priv->fullscreen_gear_button : window->priv->gear_button;
-//	g_action_map_remove_action (G_ACTION_MAP (window), "hamburger-menu");
-//	action = g_property_action_new ("hamburger-menu", button, "active");
-//	g_action_map_add_action (G_ACTION_MAP (window), G_ACTION (action));
-//	g_object_unref (action);
-//}
-
 static void
 soli_window_init (SoliWindow *window)
 {
@@ -2585,9 +2530,6 @@ soli_window_init (SoliWindow *window)
 
 	window->priv->window_group = gtk_window_group_new ();
 	gtk_window_group_add_window (window->priv->window_group, GTK_WINDOW (window));
-
-//	fullscreen_controls_setup (window);
-//	sync_fullscreen_actions (window, FALSE);
 
 	/* Setup status bar */
 	setup_statusbar (window);
@@ -2699,12 +2641,6 @@ soli_window_init (SoliWindow *window)
 			  "unrealize",
 			  G_CALLBACK (window_unrealized),
 			  NULL);
-
-	/* Check if the window is active for fullscreen */
-//	g_signal_connect (window,
-//			  "notify::is-active",
-//			  G_CALLBACK (check_window_is_active),
-//			  NULL);
 
 	soli_debug_message (DEBUG_WINDOW, "Update plugins ui");
 
@@ -3319,8 +3255,6 @@ _soli_window_fullscreen (SoliWindow *window)
 	if (_soli_window_is_fullscreen (window))
 		return;
 
-//	sync_fullscreen_actions (window, TRUE);
-
 	/* Go to fullscreen mode and hide bars */
 	gtk_window_fullscreen (GTK_WINDOW (&window->window));
 }
@@ -3332,8 +3266,6 @@ _soli_window_unfullscreen (SoliWindow *window)
 
 	if (!_soli_window_is_fullscreen (window))
 		return;
-
-//	sync_fullscreen_actions (window, FALSE);
 
 	/* Unfullscreen and show bars */
 	gtk_window_unfullscreen (GTK_WINDOW (&window->window));

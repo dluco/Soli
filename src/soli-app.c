@@ -74,7 +74,6 @@ typedef struct
 	GSettings         *editor_settings;
 	GSettings         *window_settings;
 
-	GMenuModel        *hamburger_menu;
 	GMenuModel        *notebook_menu;
 	GMenuModel        *tab_width_menu;
 	GMenuModel        *line_col_menu;
@@ -199,7 +198,6 @@ soli_app_dispose (GObject *object)
 		g_clear_object (&priv->theme_provider);
 	}
 
-	g_clear_object (&priv->hamburger_menu);
 	g_clear_object (&priv->notebook_menu);
 	g_clear_object (&priv->tab_width_menu);
 	g_clear_object (&priv->line_col_menu);
@@ -755,23 +753,6 @@ add_accelerator (GtkApplication *app,
 	gtk_application_set_accels_for_action (app, action_name, vaccels);
 }
 
-static gboolean
-show_menubar (void)
-{
-	GtkSettings *settings = gtk_settings_get_default ();
-	gboolean result;
-
-	g_object_get (settings,
-	              "gtk-shell-shows-menubar", &result,
-	              NULL);
-
-	result = TRUE;
-
-	g_print ("Show menubar: %s\n", (result) ? "true" : "false");
-
-	return result;
-}
-
 static void
 soli_app_startup (GApplication *application)
 {
@@ -814,13 +795,6 @@ soli_app_startup (GApplication *application)
 	                                 application);
 
 	/* menus */
-	if (!show_menubar ())
-	{
-		gtk_application_set_menubar (GTK_APPLICATION (application), NULL);
-		priv->hamburger_menu = get_menu_model (SOLI_APP (application),
-		                                       "hamburger-menu");
-	}
-
 	priv->notebook_menu = get_menu_model (SOLI_APP (application), "notebook-menu");
 	priv->tab_width_menu = get_menu_model (SOLI_APP (application), "tab-width-menu");
 	priv->line_col_menu = get_menu_model (SOLI_APP (application), "line-col-menu");
@@ -830,7 +804,6 @@ soli_app_startup (GApplication *application)
 	add_accelerator (GTK_APPLICATION (application), "app.quit", "<Primary>Q");
 	add_accelerator (GTK_APPLICATION (application), "app.help", "F1");
 
-	add_accelerator (GTK_APPLICATION (application), "win.hamburger-menu", "F10");
 	add_accelerator (GTK_APPLICATION (application), "win.open", "<Primary>O");
 	add_accelerator (GTK_APPLICATION (application), "win.save", "<Primary>S");
 	add_accelerator (GTK_APPLICATION (application), "win.save-as", "<Primary><Shift>S");
@@ -1894,18 +1867,6 @@ _soli_app_get_settings (SoliApp *app)
 }
 
 GMenuModel *
-_soli_app_get_hamburger_menu (SoliApp *app)
-{
-	SoliAppPrivate *priv;
-
-	g_return_val_if_fail (SOLI_IS_APP (app), NULL);
-
-	priv = soli_app_get_instance_private (app);
-
-	return priv->hamburger_menu;
-}
-
-GMenuModel *
 _soli_app_get_notebook_menu (SoliApp *app)
 {
 	SoliAppPrivate *priv;
@@ -1954,15 +1915,8 @@ _soli_app_extend_menu (SoliApp    *app,
 
 	priv = soli_app_get_instance_private (app);
 
-	/* First look in the gear or window menu */
-	if (priv->hamburger_menu)
-	{
-		model = priv->hamburger_menu;
-	}
-	else
-	{
-		model = gtk_application_get_menubar (GTK_APPLICATION (app));
-	}
+	/* First look in the window menu */
+	model = gtk_application_get_menubar (GTK_APPLICATION (app));
 
 	section = find_extension_point_section (model, extension_point);
 

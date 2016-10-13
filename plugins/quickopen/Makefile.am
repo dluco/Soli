@@ -1,12 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-plugindir = $(PLUGINS_LIB_DIR)/highlight-selected
+plugindir = $(PLUGINS_LIB_DIR)/quickopen
 
 nobase_plugin_PYTHON = \
-	highlight-selected/__init__.py
+	quickopen/__init__.py \
+	quickopen/popup.py \
+	quickopen/virtualdirs.py
 
 plugin_DATA = \
-	highlight-selected.plugin
+	quickopen.plugin
 
 EXTRA_DIST = \
 	$(plugin_DATA)
