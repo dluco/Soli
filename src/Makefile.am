@@ -176,7 +176,6 @@ ENUM_TYPES = \
 	$(NULL)
 
 soli-enum-types.h: soli-enum-types.h.template $(ENUM_TYPES) $(GLIB_MKENUMS)
-	@echo SOLI_LIBS = $(SOLI_LIBS)
 	$(AM_V_GEN) (cd $(srcdir) && $(GLIB_MKENUMS) --template soli-enum-types.h.template $(ENUM_TYPES)) > $@
 
 soli-enum-types.c: soli-enum-types.c.template $(ENUM_TYPES) $(GLIB_MKENUMS)

@@ -1,12 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-plugindir = $(PLUGINS_LIB_DIR)/highlight-selected
+plugin_moduledir = $(PLUGINS_LIB_DIR)/highlight-selected
 
-nobase_plugin_PYTHON = \
-	highlight-selected/__init__.py
+plugin_module_PYTHON = \
+	highlight-selected.py
 
-plugin_DATA = \
+plugin_module_DATA = \
 	highlight-selected.plugin
 
 EXTRA_DIST = \
-	$(plugin_DATA)
+	$(plugin_module_DATA)
