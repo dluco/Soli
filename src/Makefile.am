@@ -204,7 +204,6 @@ if HAVE_INTROSPECTION
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_GIRS = Soli-1.0.gir
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --warn-all --accept-unprefixed --identifier-prefix=Soli --verbose
-#INTROSPECTION_COMPILER_ARGS = --include-dir=$(srcdir)
 
 introspection_sources = $(soli_SOURCES)
 

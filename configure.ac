@@ -62,7 +62,14 @@ AC_SUBST(SOLI_MICRO_VERSION)
 AC_SUBST(SOLI_VERSION)
 
 # Introspection
-GOBJECT_INTROSPECTION_CHECK([1.38.0])
+GOBJECT_INTROSPECTION_CHECK([0.9.3])
+
+if test "$found_introspection" = "yes"; then
+	enable_introspection=yes
+	AC_DEFINE([ENABLE_INTROSPECTION], [1], [Define to enable GObject Introspection])
+else
+	enable_introspection=no
+fi
 
 # Misc
 GLIB_GSETTINGS
