@@ -1,0 +1,5 @@
+[Plugin]
+Module=bottom-padding
+Loader=python3
+Name=Bottom Padding
+Description=Allow scrolling past the end of the document.

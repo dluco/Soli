@@ -94,6 +94,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	data/Makefile
 	plugins/Makefile
+	plugins/bottom-padding/Makefile
 	plugins/codecomment/Makefile
 	plugins/quickopen/Makefile
 	plugins/highlight-selected/Makefile
