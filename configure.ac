@@ -9,6 +9,14 @@ m4_define([soli_version], [soli_major_version.soli_minor_version.soli_micro_vers
 
 AC_INIT([Soli], [soli_version], [dluco11@gmail.com])
 
+# Dependencies
+GLIB_REQUIRED=2.44
+GTK_REQUIRED=3.4.0
+GTKSOURCEVIEW_REQUIRED=3.19.4
+LIBPEAS_REQUIRED=1.0.0
+GSPELL_REQUIRED=0.2.5
+PYGOBJECT_REQUIRED=3.0.0	
+
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build/autotools])
 AC_CONFIG_SRCDIR([src])
@@ -32,13 +40,13 @@ AC_SUBST(LIBM)
 
 # Checks for library dependencies
 PKG_CHECK_MODULES([SOLI], [
-	glib-2.0 >= 2.44.0
-	gio-2.0 >= 2.44.0
+	glib-2.0 >= $GLIB_REQUIRED
+	gio-2.0 >= $GLIB_REQUIRED
 	gmodule-2.0 >= 2.0.0
-	gtk+-3.0 >= 3.4.0
-	gtksourceview-3.0 >= 3.19.4
-	libpeas-1.0 >= 1.0.0
-	libpeas-gtk-1.0 >= 1.0.0
+	gtk+-3.0 >= $GTK_REQUIRED
+	gtksourceview-3.0 >= $GTKSOURCEVIEW_REQUIRED
+	libpeas-1.0 >= $LIBPEAS_REQUIRED
+	libpeas-gtk-1.0 >= $LIBPEAS_REQUIRED
 ])
 
 SOLI_CFLAGS="$SOLI_CFLAGS"
@@ -77,7 +85,44 @@ GLIB_GSETTINGS
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums)
 
-AM_PATH_PYTHON
+AC_ARG_ENABLE([spell],
+			  AS_HELP_STRING([--disable-spell], \
+							 [Disable spell plugin (default: enabled)]),
+			  [enable_spell=$enableval],
+			  [enable_spell=yes])
+
+if test "x$enable_spell" = "xyes" ; then
+
+	PKG_CHECK_MODULES(GSPELL, gspell-1 >= $GSPELL_REQUIRED, \
+					  have_gspell=yes, have_gspell=no)
+
+	if test "x$have_gspell" = "xno"; then
+		AC_MSG_ERROR([gspell library not found or too old. Use --disable-spell to build without spell plugin.])
+	fi
+fi
+
+AM_CONDITIONAL(ENABLE_SPELL, test x"$enable_spell" = "xyes")
+
+AC_ARG_ENABLE([python],
+			  AS_HELP_STRING([--enable-python[=@<:@no/auto/yes@:>@]], \
+							 [Build with python support]),
+			  [enable_python=$enableval],
+			  [enable_python="auto"])
+
+if test "x$enable_python" = "xauto"; then
+	PKG_CHECK_EXISTS([pygobject-3.0 >= $PYGOBJECT_REQUIRED],
+					 [enable_python=yes],[enable_python=no])
+	fi
+
+	if test "x$enable_python" = "xyes"; then
+		AM_PATH_PYTHON(3.2.3)
+		PKG_CHECK_MODULES(PYTHON, [pygobject-3.0 >= $PYGOBJECT_REQUIRED])
+
+		pyoverridesdir="\$(pyexecdir)/gi/overrides"
+		AC_SUBST(pyoverridesdir)
+	fi
+
+AM_CONDITIONAL(ENABLE_PYTHON, test x"$enable_python" = "xyes")
 
 PLUGIN_LIBTOOL_FLAGS="-module -avoid-version"
 AC_SUBST(PLUGIN_LIBTOOL_FLAGS)
@@ -96,9 +141,11 @@ AC_CONFIG_FILES([
 	plugins/Makefile
 	plugins/bottom-padding/Makefile
 	plugins/codecomment/Makefile
-	plugins/quickopen/Makefile
 	plugins/highlight-selected/Makefile
 	plugins/modelines/Makefile
+	plugins/quickopen/Makefile
+	plugins/sort/Makefile
+	plugins/spell/Makefile
 ])
 
 AC_OUTPUT
