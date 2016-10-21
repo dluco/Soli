@@ -79,7 +79,7 @@ soli_recent_remove_if_local (GFile *location)
 	g_return_if_fail (G_IS_FILE (location));
 
 	/* If a file is local chances are that if load/save fails the file has
-	 * beed removed and the failure is permanent so we remove it from the
+	 * been removed and the failure is permanent so we remove it from the
 	 * list of recent files. For remote files the failure may be just
 	 * transitory and we keep the file in the list.
 	 */

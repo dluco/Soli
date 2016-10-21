@@ -51,6 +51,7 @@
 #include "soli-preferences-dialog.h"
 #include "soli-tab.h"
 #include "soli-tab-private.h"
+#include "soli-recent.h"
 
 #ifndef ENABLE_GVFS_METADATA
 #include "soli-metadata-manager.h"
@@ -77,6 +78,9 @@ typedef struct
 	GMenuModel        *notebook_menu;
 	GMenuModel        *tab_width_menu;
 	GMenuModel        *line_col_menu;
+	
+	SoliRecentConfiguration recent_config;
+	SoliMenuExtension *recent_files_menu;
 
 	PeasExtensionSet  *extensions;
 	GNetworkMonitor   *monitor;
@@ -201,8 +205,22 @@ soli_app_dispose (GObject *object)
 	g_clear_object (&priv->notebook_menu);
 	g_clear_object (&priv->tab_width_menu);
 	g_clear_object (&priv->line_col_menu);
-
+	
 	G_OBJECT_CLASS (soli_app_parent_class)->dispose (object);
+}
+
+static void
+soli_app_finalize (GObject *object)
+{
+	SoliAppPrivate *priv;
+	
+	priv = soli_app_get_instance_private (SOLI_APP (object));
+
+	g_object_unref (priv->recent_files_menu);
+
+	soli_recent_configuration_destroy (&priv->recent_config);
+	
+	G_OBJECT_CLASS (soli_app_parent_class)->finalize (object);
 }
 
 static void
@@ -389,6 +407,106 @@ get_active_window (GtkApplication *app)
 	}
 
 	return NULL;
+}
+
+typedef struct
+{
+	SoliApp		*app;
+	GtkRecentInfo	*info;
+} RecentFileInfo;
+
+static void
+recent_file_info_free (gpointer  data,
+                       GClosure *closure)
+{
+	RecentFileInfo *info = data;
+
+	g_object_unref (info->app);
+	gtk_recent_info_unref (info->info);
+
+	g_slice_free (RecentFileInfo, data);
+}
+
+static void
+recent_file_activated (GAction        *action,
+                       GVariant       *parameter,
+                       RecentFileInfo *info)
+{
+	SoliWindow *window;
+	const gchar *uri;
+	GFile *file;
+
+	uri = gtk_recent_info_get_uri (info->info);
+	file = g_file_new_for_uri (uri);
+
+	window = get_active_window (GTK_APPLICATION (info->app));
+
+	soli_commands_load_location (SOLI_WINDOW (window), file, NULL, 0, 0);
+	g_object_unref (file);
+}
+
+static void
+recent_files_menu_populate (SoliApp *app)
+{
+	SoliAppPrivate *priv;
+
+	GList *items;
+	gint i = 0;
+
+	priv = soli_app_get_instance_private (app);
+
+	soli_menu_extension_remove_items (priv->recent_files_menu);
+
+	items = soli_recent_get_items (&priv->recent_config);
+
+	while (items)
+	{
+		GtkRecentInfo *info = items->data;
+		GMenuItem *mitem;
+		const gchar *name;
+		gchar *acname;
+		gchar *acfullname;
+		GSimpleAction *action;
+		RecentFileInfo *finfo;
+
+		name = gtk_recent_info_get_display_name (info);
+
+		acname = g_strdup_printf ("recent-file-action-%d", ++i);
+		action = g_simple_action_new (acname, NULL);
+
+		finfo = g_slice_new (RecentFileInfo);
+		finfo->app = g_object_ref (app);
+		finfo->info = gtk_recent_info_ref (info);
+
+		g_signal_connect_data (action,
+		                       "activate",
+		                       G_CALLBACK (recent_file_activated),
+		                       finfo,
+		                       recent_file_info_free,
+		                       0);
+
+		g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+		g_object_unref (action);
+
+		acfullname = g_strdup_printf ("app.%s", acname);
+
+		mitem = g_menu_item_new (name, acfullname);
+		soli_menu_extension_append_menu_item (priv->recent_files_menu, mitem);
+
+		g_free (acfullname);
+
+		g_object_unref (mitem);
+		gtk_recent_info_unref (info);
+
+		items = g_list_delete_link (items, items);
+	}
+}
+
+static void
+recent_manager_changed (GtkRecentManager *manager,
+                        SoliApp		 *app)
+{
+	recent_files_menu_populate (app);
 }
 
 static void
@@ -830,6 +948,19 @@ soli_app_startup (GApplication *application)
 	add_accelerator (GTK_APPLICATION (application), "win.next-document", "<Primary><Alt>Page_Down");
 
 	load_accels ();
+
+	/* Recent files */
+	soli_recent_configuration_init_default (&priv->recent_config);
+
+	priv->recent_files_menu = _soli_app_extend_menu (SOLI_APP (application),
+							 "recent-files-section");
+							 
+	g_signal_connect (priv->recent_config.manager,
+			  "changed",
+			  G_CALLBACK (recent_manager_changed),
+			  SOLI_APP (application));
+	
+	recent_files_menu_populate (SOLI_APP (application));
 
 	/* Load custom css */
 	g_object_unref (load_css_from_resource ("soli-style.css", TRUE));
@@ -1298,6 +1429,7 @@ soli_app_class_init (SoliAppClass *klass)
 	GApplicationClass *app_class = G_APPLICATION_CLASS (klass);
 
 	object_class->dispose = soli_app_dispose;
+	object_class->finalize = soli_app_finalize;
 	object_class->get_property = soli_app_get_property;
 
 	app_class->startup = soli_app_startup;
