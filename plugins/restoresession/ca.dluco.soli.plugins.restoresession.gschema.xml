@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="ca.dluco.soli.plugins.restoresession" path="/ca/dluco/soli/plugins/restoresession/">
+		<key type="as" name="uris">
+			<default>['']</default>
+			<summary>Saved URI List</summary>
+			<description>A list of the URIs to restore when Soli is started.</description>
+		</key>
+		<key name="active-uri" type="s">
+			<default>''</default>
+			<summary>Saved active URI</summary>
+			<description>The URI of the previous session's active document.</description>
+		</key>
+	</schema>
+</schemalist>

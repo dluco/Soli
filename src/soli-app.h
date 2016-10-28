@@ -34,6 +34,10 @@ struct _SoliAppClass
 {
 	GtkApplicationClass parent_class;
 
+	/* Signals */
+	void	(* quit)			(SoliApp *app);
+
+	/* vfuncs */
 	gboolean (*show_help)                   (SoliApp    *app,
 	                                         GtkWindow   *parent,
 	                                         const gchar *name,
@@ -69,6 +73,8 @@ SoliWindow	*soli_app_create_window		(SoliApp    *app,
 							 GdkScreen   *screen);
 
 GList		*soli_app_get_main_windows		(SoliApp    *app);
+
+SoliWindow *	soli_app_get_active_main_window		(SoliApp *app);
 
 GList		*soli_app_get_documents		(SoliApp    *app);
 

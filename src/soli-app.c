@@ -106,6 +106,14 @@ enum
 
 static GParamSpec *properties[LAST_PROP];
 
+enum
+{
+    SIGNAL_QUIT,
+    LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL];
+
 static const GOptionEntry options[] =
 {
 	/* Version */
@@ -381,34 +389,6 @@ is_in_viewport (GtkWindow    *window,
 	       y + height <= viewport_y + sc_height;
 }
 
-static SoliWindow *
-get_active_window (GtkApplication *app)
-{
-	GdkScreen *screen;
-	guint workspace;
-	gint viewport_x, viewport_y;
-	GList *windows, *l;
-
-	screen = gdk_screen_get_default ();
-
-	workspace = soli_utils_get_current_workspace (screen);
-	soli_utils_get_current_viewport (screen, &viewport_x, &viewport_y);
-
-	/* Gtk documentation says the window list is always in MRU order */
-	windows = gtk_application_get_windows (app);
-	for (l = windows; l != NULL; l = l->next)
-	{
-		GtkWindow *window = l->data;
-
-		if (SOLI_IS_WINDOW (window) && is_in_viewport (window, screen, workspace, viewport_x, viewport_y))
-		{
-			return SOLI_WINDOW (window);
-		}
-	}
-
-	return NULL;
-}
-
 typedef struct
 {
 	SoliApp		*app;
@@ -439,7 +419,7 @@ recent_file_activated (GAction        *action,
 	uri = gtk_recent_info_get_uri (info->info);
 	file = g_file_new_for_uri (uri);
 
-	window = get_active_window (GTK_APPLICATION (info->app));
+	window = soli_app_get_active_main_window (SOLI_APP (info->app));
 
 	soli_commands_load_location (SOLI_WINDOW (window), file, NULL, 0, 0);
 	g_object_unref (file);
@@ -464,15 +444,15 @@ recent_files_menu_populate (SoliApp *app)
 		GtkRecentInfo *info = items->data;
 		GMenuItem *mitem;
 		const gchar *name;
-		gchar *acname;
-		gchar *acfullname;
+		gchar *action_name;
+		gchar *action_name_full;
 		GSimpleAction *action;
 		RecentFileInfo *finfo;
 
 		name = gtk_recent_info_get_display_name (info);
 
-		acname = g_strdup_printf ("recent-file-action-%d", ++i);
-		action = g_simple_action_new (acname, NULL);
+		action_name = g_strdup_printf ("recent-file-action-%d", ++i);
+		action = g_simple_action_new (action_name, NULL);
 
 		finfo = g_slice_new (RecentFileInfo);
 		finfo->app = g_object_ref (app);
@@ -488,12 +468,12 @@ recent_files_menu_populate (SoliApp *app)
 		g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
 		g_object_unref (action);
 
-		acfullname = g_strdup_printf ("app.%s", acname);
+		action_name_full = g_strdup_printf ("app.%s", action_name);
 
-		mitem = g_menu_item_new (name, acfullname);
+		mitem = g_menu_item_new (name, action_name_full);
 		soli_menu_extension_append_menu_item (priv->recent_files_menu, mitem);
 
-		g_free (acfullname);
+		g_free (action_name_full);
 
 		g_object_unref (mitem);
 		gtk_recent_info_unref (info);
@@ -550,7 +530,7 @@ open_files (GApplication            *application,
 
 	if (!new_window)
 	{
-		window = get_active_window (GTK_APPLICATION (application));
+		window = soli_app_get_active_main_window (SOLI_APP (application));
 	}
 
 	if (window == NULL)
@@ -722,6 +702,12 @@ quit_activated (GSimpleAction *action,
                 GVariant      *parameter,
                 gpointer       user_data)
 {
+	SoliApp *app;
+	
+	app = SOLI_APP (user_data);
+	
+	g_signal_emit (app, signals[SIGNAL_QUIT], 0);
+	
 	_soli_cmd_file_quit (NULL, NULL, NULL);
 }
 
@@ -1444,6 +1430,15 @@ soli_app_class_init (SoliAppClass *klass)
 	klass->set_window_title = soli_app_set_window_title_impl;
 	klass->create_window = soli_app_create_window_impl;
 
+	signals[SIGNAL_QUIT] = 
+		g_signal_new ("quit",
+			      SOLI_TYPE_APP,
+			      G_SIGNAL_RUN_FIRST,
+			      G_STRUCT_OFFSET (SoliAppClass, quit),
+			      NULL, NULL, NULL,
+			      G_TYPE_NONE,
+			      0);
+
 	properties[PROP_LOCKDOWN] =
 		g_param_spec_flags ("lockdown",
 		                    "Lockdown",
@@ -1694,6 +1689,42 @@ soli_app_get_main_windows (SoliApp *app)
 	}
 
 	return g_list_reverse (res);
+}
+
+/**
+ * soli_app_get_active_main_window:
+ * @app: the #SoliApp
+ *
+ * Returns the active #SoliWindow in the @app.
+ *
+ * Return value: (transfer none): the active #SoliWindow in the @app.
+ */
+SoliWindow *
+soli_app_get_active_main_window (SoliApp *app)
+{
+	GdkScreen *screen;
+	guint workspace;
+	gint viewport_x, viewport_y;
+	GList *windows, *l;
+
+	screen = gdk_screen_get_default ();
+
+	workspace = soli_utils_get_current_workspace (screen);
+	soli_utils_get_current_viewport (screen, &viewport_x, &viewport_y);
+
+	/* Gtk documentation says the window list is always in MRU order */
+	windows = gtk_application_get_windows (GTK_APPLICATION (app));
+	for (l = windows; l != NULL; l = l->next)
+	{
+		GtkWindow *window = l->data;
+
+		if (SOLI_IS_WINDOW (window) && is_in_viewport (window, screen, workspace, viewport_x, viewport_y))
+		{
+			return SOLI_WINDOW (window);
+		}
+	}
+
+	return NULL;
 }
 
 /**

@@ -144,8 +144,10 @@ AC_CONFIG_FILES([
 	plugins/highlight-selected/Makefile
 	plugins/modelines/Makefile
 	plugins/quickopen/Makefile
+	plugins/restoresession/Makefile
 	plugins/sort/Makefile
 	plugins/spell/Makefile
+	plugins/wordcompletion/Makefile
 ])
 
 AC_OUTPUT

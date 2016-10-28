@@ -6,5 +6,7 @@ SUBDIRS =				\
 	highlight-selected	\
 	modelines			\
 	quickopen			\
+	restoresession		\
 	sort				\
-	spell
+	spell				\
+	wordcompletion
