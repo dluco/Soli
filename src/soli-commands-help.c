@@ -123,8 +123,8 @@ _soli_cmd_help_about (SoliWindow *window)
 			       "logo-icon-name", "text-editor",
 			       "translator-credits", _("translator-credits"),
 			       "version", VERSION,
-			       "website", "http://www.github.com/dluco/Soli",
-			       "website-label", "www.github.com/dluco/Soli",
+			       "website", "http://www.github.com/dluco/soli",
+			       "website-label", "www.github.com/dluco/soli",
 			       NULL);
 }
 
