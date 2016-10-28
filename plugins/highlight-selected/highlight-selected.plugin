@@ -3,4 +3,6 @@ Module=highlight-selected
 Loader=python3
 Name=Highlight Selected
 Description=Highlight all occurrences of currently selected text.
-Website=https://gitlab.com/tchaik/gedit-my-plugins/tree/master/plugins/quick_highlight
+Authors=Martin Blanchard <tchaik@gmx.com>
+Copyright=Copyright © 2014 Martin Blanchard
+Website=https://gedit.org
